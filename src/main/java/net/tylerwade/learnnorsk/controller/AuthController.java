@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -69,6 +71,38 @@ public class AuthController {
             return new ResponseEntity<>(user, HttpStatus.OK);
         } catch (Exception e) {
             System.out.println("Exception in signup(): " + e.getMessage());
+            return new ResponseEntity<>("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody User loginRequest, HttpServletResponse response) {
+        try {
+            String email = loginRequest.getEmail();
+            String password = loginRequest.getPassword();
+
+            if (email == null || password == null) {
+                return new ResponseEntity<>("All fields are required", HttpStatus.BAD_REQUEST);
+            }
+
+            // Check user exists
+            Optional<User> user = userRepo.findByEmail(email);
+            if (user.isEmpty()) {
+                return new ResponseEntity<>("User not found", HttpStatus.BAD_REQUEST);
+            }
+
+            // Check password
+            if (!authUtil.verifyPassword(password, user.get().getPassword())) {
+                return new ResponseEntity<>("Invalid password", HttpStatus.BAD_REQUEST);
+            }
+
+            // Add auth token cookie
+            response.addCookie(authUtil.createAuthTokenCookie(user.get().getId()));
+
+            // Return user
+            return new ResponseEntity<>(user.get(), HttpStatus.OK);
+        } catch (Exception e) {
+            System.out.println("Exception in login(): " + e.getMessage());
             return new ResponseEntity<>("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
