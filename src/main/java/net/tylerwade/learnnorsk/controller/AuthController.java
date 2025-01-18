@@ -1,6 +1,8 @@
 package net.tylerwade.learnnorsk.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import net.tylerwade.learnnorsk.lib.middleware.ProtectedRoute;
 import net.tylerwade.learnnorsk.lib.util.AuthUtil;
 import net.tylerwade.learnnorsk.model.auth.SignupRequest;
 import net.tylerwade.learnnorsk.model.auth.User;
@@ -8,10 +10,7 @@ import net.tylerwade.learnnorsk.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
@@ -107,4 +106,26 @@ public class AuthController {
         }
     }
 
+    @DeleteMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletResponse response) {
+        try {
+            response.addCookie(authUtil.createLogoutCookie());
+            return new ResponseEntity<>("Logout successful", HttpStatus.OK);
+        } catch (Exception e) {
+            System.out.println("Exception in logout(): " + e.getMessage());
+            return new ResponseEntity<>("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/me")
+    @ProtectedRoute
+    public ResponseEntity<?> getMe(HttpServletRequest request) {
+        try {
+            User user = (User) request.getAttribute("user");
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        } catch (Exception e) {
+            System.out.println("Exception in getMe(): " + e.getMessage());
+            return new ResponseEntity<>("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

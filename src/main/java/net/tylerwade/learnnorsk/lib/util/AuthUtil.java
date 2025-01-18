@@ -3,6 +3,7 @@ package net.tylerwade.learnnorsk.lib.util;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,16 @@ public class AuthUtil {
         return cookie;
     }
 
+    public Cookie createLogoutCookie() {
+        Cookie cookie = new Cookie("authToken", "");
+        cookie.setMaxAge(0);
+        cookie.setSecure(true);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+
+        return cookie;
+    }
+
     private String createJwtCookie(String id) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(authSecret);
@@ -55,16 +66,16 @@ public class AuthUtil {
         }
     }
 
-    public boolean verifyJwtToken(String token) {
+    public String getIdFromToken(String token) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(authSecret);
-            JWT.require(algorithm)
+            DecodedJWT decodedJWT = JWT.require(algorithm)
                     .withIssuer("learnnorsk")
                     .build()
                     .verify(token);
-            return true;
+            return decodedJWT.getSubject();
         } catch (Exception e) {
-            return false;
+            return null;
         }
     }
 
