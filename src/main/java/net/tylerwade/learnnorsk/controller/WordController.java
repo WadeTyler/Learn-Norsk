@@ -30,6 +30,17 @@ public class WordController {
         return new ResponseEntity<>(wordRepo.findAll(), HttpStatus.OK);
     }
 
+    // Search for a word by eng or norsk
+    @GetMapping("/search")
+    public ResponseEntity<?> searchWords(@RequestParam String query) {
+        if (query == null || query.isEmpty()) {
+            return new ResponseEntity<>("No query provided", HttpStatus.BAD_REQUEST);
+        }
+
+        List<Word> words = wordRepo.findByNorskIgnoreCaseContainingOrEngIgnoreCaseContaining(query, query);
+        return new ResponseEntity<>(words, HttpStatus.OK);
+    }
+
     // Add an array of words
     @PostMapping({"/", ""})
     public ResponseEntity<?> addWords(@RequestBody Word[] words) {
