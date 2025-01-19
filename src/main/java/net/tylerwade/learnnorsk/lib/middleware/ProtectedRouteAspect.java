@@ -58,6 +58,10 @@ public class ProtectedRouteAspect {
             throw new UnauthorizedException("Unauthorized access.");
         }
 
+        if (!user.get().getRole().equals("user")) {
+            throw new UnauthorizedException("Unauthorized access.");
+        }
+
         request.setAttribute("user", user.get());
     }
 

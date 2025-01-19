@@ -6,6 +6,8 @@ import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import net.tylerwade.learnnorsk.lib.util.TimeUtil;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -17,34 +19,24 @@ import java.util.UUID;
 @Setter
 public class User {
 
-    private @Id String id;
+    private @Id String id = UUID.randomUUID().toString();
     private String firstName;
     private String lastName;
     @Column(unique = true)
     private String email;
     private String password;
-    private String role;
-    private String createdAt;
+    private int level = 1;
+    private int experience = 0;
+    private String role = "user";
+    private String createdAt = TimeUtil.createCreatedAt();
 
     public User(String firstName, String lastName, String email, String password) {
-        // Create UUID
-        this.id = UUID.randomUUID().toString();
-
         this.firstName = firstName;
         this.lastName = lastName;
-
         this.email = email;
         this.password = password;
-
-        // Set Default Role
-        this.role = "user";
-        // Set Created At to now
-        this.createdAt = createCreatedAt();
     }
 
-    private String createCreatedAt() {
-        return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()).toString();
-    }
 
     @Override
     public String toString() {
