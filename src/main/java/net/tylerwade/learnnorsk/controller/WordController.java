@@ -5,14 +5,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.tylerwade.learnnorsk.model.Word;
 import net.tylerwade.learnnorsk.repository.WordRepository;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.html.Option;
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +25,12 @@ public class WordController {
     @GetMapping({"/", ""})
     public ResponseEntity<?> getAllWords() {
         return new ResponseEntity<>(wordRepo.findAll(), HttpStatus.OK);
+    }
+
+    // Get total word count
+    @GetMapping("/total")
+    public ResponseEntity<?> getTotalWords() {
+        return new ResponseEntity<>(wordRepo.count(), HttpStatus.OK);
     }
 
     // Search for a word by eng or norsk
@@ -119,16 +122,31 @@ public class WordController {
         Word existingWord = existingWordOptional.get();
 
         // Update norsk
-        if (newValues.getNorsk() != null)
+        if (newValues.getNorsk() != null && !newValues.getNorsk().isBlank()) {
+            // Check if word already exists
+            Optional<Word> existingNorskWord = wordRepo.findByNorskIgnoreCase(newValues.getNorsk());
+            if (existingNorskWord.isPresent() && !existingNorskWord.get().equals(existingWord)) {
+                return new ResponseEntity<>("The word '" + newValues.getNorsk() + "' already exists in Norsk.", HttpStatus.BAD_REQUEST);
+            }
+
             existingWord.setNorsk(newValues.getNorsk());
+        }
 
         // Update eng
-        if (newValues.getEng() != null)
+        if (newValues.getEng() != null && !newValues.getEng().isBlank()) {
+            // Check if word already exists
+            Optional<Word> existingEngWord = wordRepo.findByEngIgnoreCase(newValues.getEng());
+            if (existingEngWord.isPresent() && !existingEngWord.get().equals(existingWord)) {
+                return new ResponseEntity<>("The word '" + newValues.getEng() + "' already exists in Eng.", HttpStatus.BAD_REQUEST);
+            }
+
             existingWord.setEng(newValues.getEng());
+        }
 
         // Update image
-        if (newValues.getImage() != null)
+        if (newValues.getImage() != null && !newValues.getImage().isBlank()) {
             existingWord.setImage(newValues.getImage());
+        }
 
         wordRepo.save(existingWord);
 
