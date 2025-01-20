@@ -52,14 +52,7 @@ public class WordController {
             return new ResponseEntity<>("No words provided", HttpStatus.BAD_REQUEST);
         }
 
-
         List<Word> existingWords = new ArrayList<>();
-        // TODO: remove debug message
-        // Debug:
-        System.out.println("Attempting to add the words:");
-        for (Word word : words) {
-            System.out.println(word.toString());
-        }
 
         // Check if words already exist in eng
         for (Word word : words) {
