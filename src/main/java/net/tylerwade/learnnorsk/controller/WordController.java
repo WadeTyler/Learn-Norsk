@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.tylerwade.learnnorsk.model.Word;
 import net.tylerwade.learnnorsk.repository.WordRepository;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,6 +43,29 @@ public class WordController {
 
         List<Word> words = wordRepo.findByNorskIgnoreCaseContainingOrEngIgnoreCaseContaining(query, query);
         return new ResponseEntity<>(words, HttpStatus.OK);
+    }
+
+
+    // Search for a word by norsk
+    @GetMapping("/search/norsk")
+    public ResponseEntity<?> searchWordsByNorsk(@RequestParam String query) {
+        Optional<Word> word = wordRepo.findByNorskIgnoreCase(query);
+        if (!word.isPresent()) {
+            return new ResponseEntity<>("Word not found", HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(word.get(), HttpStatus.OK);
+    }
+
+    // Search for a word by eng
+    @GetMapping("/search/eng")
+    public ResponseEntity<?> searchWordsByEng(@RequestParam String query) {
+        Optional<Word> word = wordRepo.findByEngIgnoreCase(query);
+        if (!word.isPresent()) {
+            return new ResponseEntity<>("Word not found", HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(word.get(), HttpStatus.OK);
     }
 
     // Add an array of words
