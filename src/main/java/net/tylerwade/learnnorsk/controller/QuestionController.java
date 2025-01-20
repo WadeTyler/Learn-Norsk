@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -141,6 +142,35 @@ public class QuestionController {
         }
 
         return new ResponseEntity<>(question.get(), HttpStatus.OK);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<?> searchQuestionsByTitleAndId(@RequestParam String query) {
+        System.out.println(query);
+
+        if (query == null || query.isEmpty()) {
+            return new ResponseEntity<>(questionRepo.findAll(), HttpStatus.OK);
+        }
+
+        List<Question> questions = questionRepo.findByTitleContainingIgnoreCase(query);
+
+        if (questionUtil.isInteger(query)) {
+            int queryId = Integer.parseInt(query);
+            if (queryId > 0) {
+                Optional<Question> question = questionRepo.findById(queryId);
+                if (question.isPresent()) {
+                    questions.add(question.get());
+                }
+            }
+        }
+
+        return new ResponseEntity<>(questions, HttpStatus.OK);
+
+    }
+
+    @GetMapping("/total")
+    public ResponseEntity<?> getTotalQuestions() {
+        return new ResponseEntity<>(questionRepo.count(), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
