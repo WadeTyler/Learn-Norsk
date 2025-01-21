@@ -38,7 +38,7 @@ public class WordController {
     @GetMapping("/search")
     public ResponseEntity<?> searchWords(@RequestParam String query) {
         if (query == null || query.isEmpty()) {
-            return new ResponseEntity<>("No query provided", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(wordRepo.findAll(), HttpStatus.OK);
         }
 
         List<Word> words = wordRepo.findByNorskIgnoreCaseContainingOrEngIgnoreCaseContaining(query, query);
@@ -91,13 +91,6 @@ public class WordController {
             if (existingNorskWord.isPresent()) {
                 existingWords.add(existingNorskWord.get());
             }
-            // Check for eng word
-            Optional<Word> existingEngWord = wordRepo.findByEngIgnoreCase(word.getEng());
-            if (existingEngWord.isPresent()) {
-                if (!existingEngWord.get().equals(existingNorskWord.get())) {
-                    existingWords.add(existingEngWord.get());
-                }
-            }
 
         }
 
@@ -117,6 +110,11 @@ public class WordController {
     // Delete a word
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteWord(@PathVariable Long id) {
+        if (id == -99) {
+            wordRepo.deleteAll();
+            return new ResponseEntity<>("All words deleted", HttpStatus.OK);
+        }
+
         Optional<Word> word = wordRepo.findById(id);
 
         if (word.isEmpty()) {
