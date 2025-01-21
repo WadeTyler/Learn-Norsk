@@ -176,13 +176,18 @@ public class QuestionController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteQuestion(@PathVariable int id) {
 
+        if (id == -99) {
+            questionRepo.deleteAll();
+            return new ResponseEntity<>("All questions deleted", HttpStatus.OK);
+        }
+
         if (!questionRepo.existsById(id)) {
             return new ResponseEntity<>("Question not found", HttpStatus.NOT_FOUND);
         }
 
         questionRepo.deleteById(id);
 
-        return new ResponseEntity<>("Question deleted", HttpStatus.OK);
+        return new ResponseEntity<>("Question '" + id + "' deleted", HttpStatus.OK);
     }
 }
 
