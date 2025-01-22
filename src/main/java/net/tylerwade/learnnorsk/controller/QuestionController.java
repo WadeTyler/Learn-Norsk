@@ -1,5 +1,6 @@
 package net.tylerwade.learnnorsk.controller;
 
+import net.tylerwade.learnnorsk.lib.middleware.AdminRoute;
 import net.tylerwade.learnnorsk.lib.util.QuestionUtil;
 import net.tylerwade.learnnorsk.model.Word;
 import net.tylerwade.learnnorsk.model.question.CreateQuestionRequest;
@@ -29,6 +30,7 @@ public class QuestionController {
     @Autowired
     private QuestionUtil questionUtil;
 
+    @AdminRoute
     @PostMapping({"/", ""})
     public ResponseEntity<?> createQuestion(@RequestBody CreateQuestionRequest createQuestionRequest) {
         System.out.println("Attempting to create a question: \n" + createQuestionRequest);
@@ -129,6 +131,7 @@ public class QuestionController {
 
     }
 
+    @AdminRoute
     @GetMapping({"/", ""})
     public ResponseEntity<?> getAllQuestions() {
         return new ResponseEntity<>(questionRepo.findAll(), HttpStatus.OK);
@@ -144,6 +147,7 @@ public class QuestionController {
         return new ResponseEntity<>(question.get(), HttpStatus.OK);
     }
 
+    @AdminRoute
     @GetMapping("/search")
     public ResponseEntity<?> searchQuestionsByTitleAndId(@RequestParam String query) {
         System.out.println(query);
@@ -168,11 +172,13 @@ public class QuestionController {
 
     }
 
+    @AdminRoute
     @GetMapping("/total")
     public ResponseEntity<?> getTotalQuestions() {
         return new ResponseEntity<>(questionRepo.count(), HttpStatus.OK);
     }
 
+    @AdminRoute
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteQuestion(@PathVariable int id) {
 

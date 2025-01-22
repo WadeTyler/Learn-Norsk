@@ -3,6 +3,7 @@ package net.tylerwade.learnnorsk.controller;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import net.tylerwade.learnnorsk.lib.middleware.AdminRoute;
 import net.tylerwade.learnnorsk.model.Word;
 import net.tylerwade.learnnorsk.repository.WordRepository;
 import org.apache.coyote.Response;
@@ -23,18 +24,21 @@ public class WordController {
     private WordRepository wordRepo;
 
     // Get all words
+    @AdminRoute
     @GetMapping({"/", ""})
     public ResponseEntity<?> getAllWords() {
         return new ResponseEntity<>(wordRepo.findAll(), HttpStatus.OK);
     }
 
     // Get total word count
+    @AdminRoute
     @GetMapping("/total")
     public ResponseEntity<?> getTotalWords() {
         return new ResponseEntity<>(wordRepo.count(), HttpStatus.OK);
     }
 
     // Search for a word by eng or norsk
+    @AdminRoute
     @GetMapping("/search")
     public ResponseEntity<?> searchWords(@RequestParam String query) {
         if (query == null || query.isEmpty()) {
@@ -47,6 +51,7 @@ public class WordController {
 
 
     // Search for a word by norsk
+    @AdminRoute
     @GetMapping("/search/norsk")
     public ResponseEntity<?> searchWordsByNorsk(@RequestParam String query) {
         Optional<Word> word = wordRepo.findByNorskIgnoreCase(query);
@@ -58,6 +63,7 @@ public class WordController {
     }
 
     // Search for a word by eng
+    @AdminRoute
     @GetMapping("/search/eng")
     public ResponseEntity<?> searchWordsByEng(@RequestParam String query) {
         Optional<Word> word = wordRepo.findByEngIgnoreCase(query);
@@ -69,6 +75,7 @@ public class WordController {
     }
 
     // Add an array of words
+    @AdminRoute
     @PostMapping({"/", ""})
     public ResponseEntity<?> addWords(@RequestBody Word[] words) {
 
@@ -108,6 +115,7 @@ public class WordController {
     }
 
     // Delete a word
+    @AdminRoute
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteWord(@PathVariable Long id) {
         if (id == -99) {
@@ -127,6 +135,7 @@ public class WordController {
     }
 
     // Update a word
+    @AdminRoute
     @PutMapping("/{id}")
     public ResponseEntity<?> updateWord(@PathVariable Long id, @RequestBody Word newValues) {
         Optional<Word> existingWordOptional = wordRepo.findById(id);
