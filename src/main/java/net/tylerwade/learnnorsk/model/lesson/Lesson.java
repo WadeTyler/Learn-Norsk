@@ -14,6 +14,8 @@ public class Lesson {
 
     @Id @GeneratedValue
     private int id;
+    private String title;
+    private String description;
     private int lessonNumber;
     private int experienceReward;
     private String createdAt = TimeUtil.createCreatedAt();
@@ -26,7 +28,10 @@ public class Lesson {
     )
     private List<Question> questions;
 
-    public Lesson(int lessonNumber, int experienceReward, List<Question> questions) {
+
+    public Lesson(String title, String description, int lessonNumber, int experienceReward, List<Question> questions) {
+        this.title = title;
+        this.description = description;
         this.lessonNumber = lessonNumber;
         this.experienceReward = experienceReward;
         this.questions = questions;

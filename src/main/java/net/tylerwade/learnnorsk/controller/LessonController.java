@@ -40,11 +40,13 @@ public class LessonController {
     @PostMapping({"/", ""})
     public ResponseEntity<?> createLesson(@RequestBody CreateLessonRequest createLessonRequest) {
 
+        String title = createLessonRequest.getTitle();
+        String description = createLessonRequest.getDescription();
         int lessonNumber = createLessonRequest.getLessonNumber();
         int experienceReward = createLessonRequest.getExperienceReward();
         int[] questionIds = createLessonRequest.getQuestionIds();
 
-        if (lessonNumber == 0 || experienceReward == 0 || questionIds.length == 0) {
+        if (title.isEmpty() || title == null || description.isEmpty() || description == null || lessonNumber == 0 || experienceReward == 0 || questionIds.length == 0) {
             return ResponseEntity.badRequest().body("Invalid request");
         }
 
@@ -67,7 +69,7 @@ public class LessonController {
         }
 
         // Create lesson
-        Lesson newLesson = new Lesson(lessonNumber, experienceReward, questions);
+        Lesson newLesson = new Lesson(title, description, lessonNumber, experienceReward, questions);
         lessonRepo.save(newLesson);
 
         return new ResponseEntity<>(newLesson, HttpStatus.CREATED);
