@@ -58,7 +58,10 @@ public class ProtectedRouteAspect {
             throw new UnauthorizedException("Unauthorized access.");
         }
 
-        if (!user.get().getRole().equals("user")) {
+
+        String role = user.get().getRole();
+
+        if (!role.equals("user") && !role.equals("admin")) {
             throw new UnauthorizedException("Unauthorized access.");
         }
 
