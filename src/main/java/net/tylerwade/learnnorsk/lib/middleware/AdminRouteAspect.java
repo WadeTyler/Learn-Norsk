@@ -59,9 +59,6 @@ public class AdminRouteAspect {
         String role = user.get().getRole();
         if (!role.equals("admin")) throw new UnauthorizedException("Unauthorized access.");
 
-        // remove password
-        user.get().setPassword(null);
-
         request.setAttribute("user", user.get());
     }
 

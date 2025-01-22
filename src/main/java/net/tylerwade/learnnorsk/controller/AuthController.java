@@ -121,6 +121,7 @@ public class AuthController {
     public ResponseEntity<?> getMe(HttpServletRequest request) {
         try {
             User user = (User) request.getAttribute("user");
+            user.setPassword(null);
             return new ResponseEntity<>(user, HttpStatus.OK);
         } catch (Exception e) {
             System.out.println("Exception in getMe(): " + e.getMessage());
