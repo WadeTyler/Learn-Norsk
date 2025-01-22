@@ -1,6 +1,7 @@
 package net.tylerwade.learnnorsk.controller;
 
 import net.tylerwade.learnnorsk.lib.middleware.AdminRoute;
+import net.tylerwade.learnnorsk.lib.middleware.ProtectedRoute;
 import net.tylerwade.learnnorsk.lib.util.QuestionUtil;
 import net.tylerwade.learnnorsk.model.Word;
 import net.tylerwade.learnnorsk.model.question.CreateQuestionRequest;
