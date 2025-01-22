@@ -27,7 +27,6 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody SignupRequest signupRequest, HttpServletResponse response) {
         try {
-
             String firstName = signupRequest.getFirstName();
             String lastName = signupRequest.getLastName();
             String email = signupRequest.getEmail();
@@ -80,19 +79,19 @@ public class AuthController {
             String email = loginRequest.getEmail();
             String password = loginRequest.getPassword();
 
-            if (email == null || password == null) {
+            if (email == null || email.isEmpty() || password == null || password.isEmpty()) {
                 return new ResponseEntity<>("All fields are required", HttpStatus.BAD_REQUEST);
             }
 
             // Check user exists
             Optional<User> user = userRepo.findByEmail(email);
             if (user.isEmpty()) {
-                return new ResponseEntity<>("User not found", HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>("Invalid Email or Password", HttpStatus.BAD_REQUEST);
             }
 
             // Check password
             if (!authUtil.verifyPassword(password, user.get().getPassword())) {
-                return new ResponseEntity<>("Invalid password", HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>("Invalid Email or Password", HttpStatus.BAD_REQUEST);
             }
 
             // Add auth token cookie

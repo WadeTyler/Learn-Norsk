@@ -62,6 +62,9 @@ public class ProtectedRouteAspect {
             throw new UnauthorizedException("Unauthorized access.");
         }
 
+        // remove password
+        user.get().setPassword(null);
+
         request.setAttribute("user", user.get());
     }
 
