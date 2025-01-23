@@ -138,6 +138,7 @@ public class QuestionController {
         return new ResponseEntity<>(questionRepo.findAll(), HttpStatus.OK);
     }
 
+    @ProtectedRoute
     @GetMapping("/{id}")
     public ResponseEntity<?> getQuestion(@PathVariable int id) {
         Optional<Question> question = questionRepo.findById(id);

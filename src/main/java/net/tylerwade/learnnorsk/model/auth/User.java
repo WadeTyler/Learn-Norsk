@@ -1,16 +1,16 @@
 package net.tylerwade.learnnorsk.model.auth;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.tylerwade.learnnorsk.lib.util.TimeUtil;
+import net.tylerwade.learnnorsk.model.lesson.Lesson;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Entity

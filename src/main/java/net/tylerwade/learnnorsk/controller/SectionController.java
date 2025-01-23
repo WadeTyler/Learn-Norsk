@@ -67,7 +67,7 @@ public class SectionController {
     @ProtectedRoute
     @GetMapping({"", "/"})
     public ResponseEntity<?> getAllSections() {
-        List<Section> sections = sectionRepo.findAll();
+        List<Section> sections = sectionRepo.findAllOrderBySectionNumberAsc();
 
         // Remove questions from each lesson
         for (Section section : sections) {
@@ -98,6 +98,34 @@ public class SectionController {
     @GetMapping("/total")
     public ResponseEntity<?> getTotalSections() {
         return new ResponseEntity<>(sectionRepo.count(), HttpStatus.OK);
+    }
+
+    @ProtectedRoute
+    @GetMapping("/{sectionId}/lessons/{lessonId}/questions")
+    public ResponseEntity<?> getQuestionsInLessonInSection(@PathVariable int sectionId, @PathVariable int lessonId) {
+
+        // Check valid section id
+        Optional<Section> section = sectionRepo.findById(sectionId);
+        if (section.isEmpty()) return new ResponseEntity<>("Section not found.", HttpStatus.NOT_FOUND);
+
+        // Check valid lesson id
+        Optional<Lesson> lesson = lessonRepo.findById(lessonId);
+        if (lesson.isEmpty()) return new ResponseEntity<>("Lesson not found", HttpStatus.NOT_FOUND);
+
+        // Check lesson is in section
+        boolean isLessonInSection = false;
+        for (Lesson l : section.get().getLessons()) {
+            if (l.getId() == lesson.get().getId()) {
+                isLessonInSection = true;
+                break;
+            }
+        }
+
+        if (!isLessonInSection) return new ResponseEntity<>("Requested Lesson is not in that section", HttpStatus.BAD_REQUEST);
+
+        // TODO: Add check to see if user had unlocked that lesson
+
+        return new ResponseEntity<>(lesson.get().getQuestions(), HttpStatus.OK);
     }
 
     @AdminRoute

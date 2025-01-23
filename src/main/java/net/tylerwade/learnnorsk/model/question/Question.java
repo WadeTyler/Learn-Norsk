@@ -16,6 +16,7 @@ public class Question {
     @GeneratedValue
     private int id;
     private String type;
+    // TODO: Convert question title List Of words
     private String title;
 
     @ManyToMany
