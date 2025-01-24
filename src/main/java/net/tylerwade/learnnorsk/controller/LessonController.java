@@ -157,11 +157,9 @@ public class LessonController {
         User user = (User) request.getAttribute("user");
 
         List<CompletedLesson> completedLessons = completedLessonRepo.getCompletedLessonByUserId(user.getId());
-        System.out.println(completedLessons);
         return new ResponseEntity<>(completedLessons, HttpStatus.OK);
 
     }
-
 
 
 }
