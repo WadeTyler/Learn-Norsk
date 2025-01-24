@@ -9,6 +9,7 @@ import net.tylerwade.learnnorsk.lib.util.UserUtil;
 import net.tylerwade.learnnorsk.model.Word;
 import net.tylerwade.learnnorsk.model.auth.User;
 import net.tylerwade.learnnorsk.model.lesson.CheckAnswersRequest;
+import net.tylerwade.learnnorsk.model.lesson.CompletedLesson;
 import net.tylerwade.learnnorsk.model.lesson.CreateLessonRequest;
 import net.tylerwade.learnnorsk.model.lesson.Lesson;
 import net.tylerwade.learnnorsk.model.question.Question;
@@ -155,63 +156,12 @@ public class LessonController {
     public ResponseEntity<?> getCompletedLessons(HttpServletRequest request) {
         User user = (User) request.getAttribute("user");
 
-        List<Integer> completedLessons = completedLessonRepo.getCompletedLessonIdsByUserId(user.getId());
+        List<CompletedLesson> completedLessons = completedLessonRepo.getCompletedLessonByUserId(user.getId());
+        System.out.println(completedLessons);
         return new ResponseEntity<>(completedLessons, HttpStatus.OK);
 
     }
 
-    @ProtectedRoute
-    @PostMapping("/{id}/check-answers")
-    public ResponseEntity<?> checkAnswers(@PathVariable int id, @RequestBody List<CheckAnswersRequest> userAnswers, HttpServletRequest request) throws Exception {
-        System.out.println("Checking user answers");
 
-        User user = (User) request.getAttribute("user");
-
-        Optional<Lesson> lessonOptional = lessonRepo.findById(id);
-        if (lessonOptional.isEmpty()) return new ResponseEntity<>("Invalid Lesson Id", HttpStatus.BAD_REQUEST);
-        List<Question> questions = lessonOptional.get().getQuestions();
-
-        // Check length matching
-        if (userAnswers.size() != questions.size()) {
-            return new ResponseEntity<>("Question and Answer size does not match", HttpStatus.BAD_REQUEST);
-        }
-
-        // TODO: Write more efficient. Current is O(n^3), although this isn't THAT bad since questions are light, but can do better
-        // Check each question's answers match
-        for (CheckAnswersRequest userAnswer : userAnswers) {
-
-            boolean matchFound = false;
-
-            // Find matching question
-            for (Question question : questions) {
-                if (question.getId() == userAnswer.getQuestionId()) {
-                    matchFound = true;
-                    // Check answers size
-                    if (question.getAnswer().size() != userAnswer.getAnswer().size()) return new ResponseEntity<>("A question is incorrect", HttpStatus.BAD_REQUEST);
-
-                    // Check answer order
-                    for (int i = 0; i < question.getAnswer().size(); i++) {
-                        if (question.getAnswer().get(i).getId() != userAnswer.getAnswer().get(i).getId()) {
-                            return new ResponseEntity<>("A question is incorrect", HttpStatus.BAD_REQUEST);
-                        }
-                    }
-                }
-            }
-
-            if (!matchFound) {
-                return new ResponseEntity<>("A question does not have a matching answer", HttpStatus.BAD_REQUEST);
-            }
-        }
-
-        // Increase user's experience
-        userUtil.addExperience(user.getId(), lessonOptional.get().getExperienceReward());
-
-        // Add lesson completion to the user's stats
-        lessonUtil.addCompletedLesson(user.getId(), lessonOptional.get().getId());
-
-        // TODO: Add check if the user has completed the section
-
-        return new ResponseEntity<>("Answers are all correct!", HttpStatus.OK);
-    }
 
 }

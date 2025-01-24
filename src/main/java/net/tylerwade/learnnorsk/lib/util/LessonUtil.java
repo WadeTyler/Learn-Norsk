@@ -14,11 +14,11 @@ public class LessonUtil {
     @Autowired
     CompletedLessonRepository completedLessonRepo;
 
-    public void addCompletedLesson(String userId, int lessonId) {
-        Optional<CompletedLesson> completedLessonOptional = completedLessonRepo.findByUserIdAndLessonId(userId, lessonId);
+    public void addCompletedLesson(String userId, int sectionId, int lessonId) {
+        Optional<CompletedLesson> completedLessonOptional = completedLessonRepo.findByUserIdAndLessonIdAndSectionId(userId, lessonId, sectionId);
         if (completedLessonOptional.isPresent()) return;
 
-        CompletedLesson newCompletedLesson = new CompletedLesson(userId, lessonId);
+        CompletedLesson newCompletedLesson = new CompletedLesson(userId, sectionId, lessonId);
         completedLessonRepo.save(newCompletedLesson);
     }
 

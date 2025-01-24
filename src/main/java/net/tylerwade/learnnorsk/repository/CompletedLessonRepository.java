@@ -13,9 +13,8 @@ public interface CompletedLessonRepository  extends JpaRepository<CompletedLesso
 
     public List<CompletedLesson> findByUserId(String userId);
 
-    public Optional<CompletedLesson> findByUserIdAndLessonId(String userId, int lessonId);
+    public Optional<CompletedLesson> findByUserIdAndLessonIdAndSectionId(String userId, int lessonId, int sectionId);
 
-    @Query(value = "SELECT c.lessonId FROM CompletedLesson c WHERE c.userId = ?1")
-    public List<Integer> getCompletedLessonIdsByUserId(String user);
+    List<CompletedLesson> getCompletedLessonByUserId(String userId);
 
 }

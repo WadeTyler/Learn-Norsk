@@ -1,8 +1,14 @@
 package net.tylerwade.learnnorsk.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import net.tylerwade.learnnorsk.lib.middleware.AdminRoute;
 import net.tylerwade.learnnorsk.lib.middleware.ProtectedRoute;
+import net.tylerwade.learnnorsk.lib.util.LessonUtil;
+import net.tylerwade.learnnorsk.lib.util.UserUtil;
+import net.tylerwade.learnnorsk.model.auth.User;
+import net.tylerwade.learnnorsk.model.lesson.CheckAnswersRequest;
 import net.tylerwade.learnnorsk.model.lesson.Lesson;
+import net.tylerwade.learnnorsk.model.question.Question;
 import net.tylerwade.learnnorsk.model.section.CreateSectionRequest;
 import net.tylerwade.learnnorsk.model.section.Section;
 import net.tylerwade.learnnorsk.repository.LessonRepository;
@@ -24,6 +30,12 @@ public class SectionController {
 
     @Autowired
     private LessonRepository lessonRepo;
+
+    @Autowired
+    private UserUtil userUtil;
+
+    @Autowired
+    private LessonUtil lessonUtil;
 
     @AdminRoute
     @PostMapping({"", "/"})
@@ -141,6 +153,75 @@ public class SectionController {
         if (section.isEmpty()) return new ResponseEntity<>("Section not found", HttpStatus.NOT_FOUND);
         sectionRepo.delete(section.get());
         return new ResponseEntity<>("Section '" + id + "' deleted.", HttpStatus.OK);
+    }
+
+    @ProtectedRoute
+    @PostMapping("/{sectionId}/lessons/{lessonId}/check-answers")
+    public ResponseEntity<?> checkAnswers(@PathVariable int sectionId, @PathVariable int lessonId, @RequestBody List<CheckAnswersRequest> userAnswers, HttpServletRequest request) throws Exception {
+        User user = (User) request.getAttribute("user");
+
+        // Check section exists
+        Optional<Section> sectionOptional = sectionRepo.findById(sectionId);
+        if (sectionOptional.isEmpty()) return new ResponseEntity<>("Invalid Section Id", HttpStatus.BAD_REQUEST);
+
+        // Check lesson exists
+        Optional<Lesson> lessonOptional = lessonRepo.findById(lessonId);
+        if (lessonOptional.isEmpty()) return new ResponseEntity<>("Invalid Lesson Id", HttpStatus.BAD_REQUEST);
+
+
+        // Check lesson is in section
+        boolean exists = false;
+        for (Lesson lesson : sectionOptional.get().getLessons()) {
+            if (lesson.getId() == lessonOptional.get().getId()) {
+                exists = true;
+                break;
+            }
+        }
+        if (!exists) return new ResponseEntity<>("Lesson does not match section", HttpStatus.BAD_REQUEST);
+
+        List<Question> questions = lessonOptional.get().getQuestions();
+
+        // Check length matching
+        if (userAnswers.size() != questions.size()) {
+            return new ResponseEntity<>("Question and Answer size does not match", HttpStatus.BAD_REQUEST);
+        }
+
+        // TODO: Write more efficient. Current is O(n^3), although this isn't THAT bad since questions are light, but can do better
+        // Check each question's answers match
+        for (CheckAnswersRequest userAnswer : userAnswers) {
+
+            boolean matchFound = false;
+
+            // Find matching question
+            for (Question question : questions) {
+                if (question.getId() == userAnswer.getQuestionId()) {
+                    matchFound = true;
+                    // Check answers size
+                    if (question.getAnswer().size() != userAnswer.getAnswer().size()) return new ResponseEntity<>("A question is incorrect", HttpStatus.BAD_REQUEST);
+
+                    // Check answer order
+                    for (int i = 0; i < question.getAnswer().size(); i++) {
+                        if (question.getAnswer().get(i).getId() != userAnswer.getAnswer().get(i).getId()) {
+                            return new ResponseEntity<>("A question is incorrect", HttpStatus.BAD_REQUEST);
+                        }
+                    }
+                }
+            }
+
+            if (!matchFound) {
+                return new ResponseEntity<>("A question does not have a matching answer", HttpStatus.BAD_REQUEST);
+            }
+        }
+
+        // Increase user's experience
+        userUtil.addExperience(user.getId(), lessonOptional.get().getExperienceReward());
+
+        // Add lesson completion to the user's stats
+        lessonUtil.addCompletedLesson(user.getId(), sectionId, lessonOptional.get().getId());
+
+        // TODO: Add check if the user has completed the section
+
+        return new ResponseEntity<>("Answers are all correct!", HttpStatus.OK);
     }
 
 }

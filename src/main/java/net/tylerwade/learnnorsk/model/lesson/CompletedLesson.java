@@ -14,10 +14,12 @@ public class CompletedLesson {
     @Id @GeneratedValue
     private int id;
     private String userId;
+    private int sectionId;
     private int lessonId;
 
-    public CompletedLesson(String userId, int lessonId) {
+    public CompletedLesson(String userId, int sectionId, int lessonId) {
         this.userId = userId;
+        this.sectionId = sectionId;
         this.lessonId = lessonId;
     }
 }
