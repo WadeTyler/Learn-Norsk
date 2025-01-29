@@ -1,14 +1,11 @@
 package net.tylerwade.learnnorsk.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
-import net.tylerwade.learnnorsk.lib.middleware.AdminRoute;
-import net.tylerwade.learnnorsk.lib.middleware.ProtectedRoute;
-import net.tylerwade.learnnorsk.lib.util.AuthUtil;
+import net.tylerwade.learnnorsk.lib.interceptor.admin.AdminRoute;
+import net.tylerwade.learnnorsk.lib.interceptor.user.ProtectedRoute;
 import net.tylerwade.learnnorsk.lib.util.LessonUtil;
 import net.tylerwade.learnnorsk.lib.util.UserUtil;
-import net.tylerwade.learnnorsk.model.Word;
 import net.tylerwade.learnnorsk.model.auth.User;
-import net.tylerwade.learnnorsk.model.lesson.CheckAnswersRequest;
 import net.tylerwade.learnnorsk.model.lesson.CompletedLesson;
 import net.tylerwade.learnnorsk.model.lesson.CreateLessonRequest;
 import net.tylerwade.learnnorsk.model.lesson.Lesson;

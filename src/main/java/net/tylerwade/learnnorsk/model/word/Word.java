@@ -1,4 +1,4 @@
-package net.tylerwade.learnnorsk.model;
+package net.tylerwade.learnnorsk.model.word;
 
 import jakarta.persistence.*;
 import lombok.Getter;

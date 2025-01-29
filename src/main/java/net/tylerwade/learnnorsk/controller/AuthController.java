@@ -2,7 +2,7 @@ package net.tylerwade.learnnorsk.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import net.tylerwade.learnnorsk.lib.middleware.ProtectedRoute;
+import net.tylerwade.learnnorsk.lib.interceptor.user.ProtectedRoute;
 import net.tylerwade.learnnorsk.lib.util.AuthUtil;
 import net.tylerwade.learnnorsk.model.auth.SignupRequest;
 import net.tylerwade.learnnorsk.model.auth.User;

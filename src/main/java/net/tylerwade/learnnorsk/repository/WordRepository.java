@@ -1,6 +1,6 @@
 package net.tylerwade.learnnorsk.repository;
 
-import net.tylerwade.learnnorsk.model.Word;
+import net.tylerwade.learnnorsk.model.word.Word;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,4 +1,4 @@
-package net.tylerwade.learnnorsk.lib.middleware;
+package net.tylerwade.learnnorsk.lib.interceptor.user;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,7 +27,7 @@ public class ProtectedRouteAspect {
     @Autowired
     private UserRepository userRepo;
 
-    @Pointcut("@annotation(net.tylerwade.learnnorsk.lib.middleware.ProtectedRoute)")
+    @Pointcut("@annotation(net.tylerwade.learnnorsk.lib.interceptor.user.ProtectedRoute)")
     public void protectedRouteMethods() {
         // empty
     }

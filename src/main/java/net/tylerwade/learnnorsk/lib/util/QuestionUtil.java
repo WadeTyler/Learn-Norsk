@@ -1,10 +1,8 @@
 package net.tylerwade.learnnorsk.lib.util;
 
-import net.tylerwade.learnnorsk.model.Word;
-import net.tylerwade.learnnorsk.model.question.CreateQuestionRequest;
+import net.tylerwade.learnnorsk.model.word.Word;
 import net.tylerwade.learnnorsk.repository.WordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;

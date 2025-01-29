@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import net.tylerwade.learnnorsk.model.Word;
+import net.tylerwade.learnnorsk.model.word.Word;
 
 import java.util.List;
 

@@ -1,9 +1,9 @@
 package net.tylerwade.learnnorsk.controller;
 
-import net.tylerwade.learnnorsk.lib.middleware.AdminRoute;
-import net.tylerwade.learnnorsk.lib.middleware.ProtectedRoute;
+import net.tylerwade.learnnorsk.lib.interceptor.admin.AdminRoute;
+import net.tylerwade.learnnorsk.lib.interceptor.user.ProtectedRoute;
 import net.tylerwade.learnnorsk.lib.util.QuestionUtil;
-import net.tylerwade.learnnorsk.model.Word;
+import net.tylerwade.learnnorsk.model.word.Word;
 import net.tylerwade.learnnorsk.model.question.CreateQuestionRequest;
 import net.tylerwade.learnnorsk.model.question.Question;
 import net.tylerwade.learnnorsk.repository.QuestionRepository;
@@ -13,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

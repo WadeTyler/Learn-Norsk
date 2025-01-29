@@ -1,4 +1,4 @@
-package net.tylerwade.learnnorsk.lib.middleware;
+package net.tylerwade.learnnorsk.lib.interceptor.admin;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,7 +27,7 @@ public class AdminRouteAspect {
     @Autowired
     private UserRepository userRepo;
 
-    @Pointcut("@annotation(net.tylerwade.learnnorsk.lib.middleware.AdminRoute)")
+    @Pointcut("@annotation(net.tylerwade.learnnorsk.lib.interceptor.admin.AdminRoute)")
     public void adminRouteMethods() {
         // empty
     }
