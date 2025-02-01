@@ -4,11 +4,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import net.tylerwade.learnnorsk.lib.interceptor.admin.AdminRoute;
 import net.tylerwade.learnnorsk.lib.interceptor.user.ProtectedRoute;
 import net.tylerwade.learnnorsk.lib.util.LessonUtil;
+import net.tylerwade.learnnorsk.lib.util.QuestionUtil;
 import net.tylerwade.learnnorsk.lib.util.UserUtil;
 import net.tylerwade.learnnorsk.model.auth.User;
 import net.tylerwade.learnnorsk.model.lesson.CheckAnswersRequest;
 import net.tylerwade.learnnorsk.model.lesson.Lesson;
 import net.tylerwade.learnnorsk.model.question.Question;
+import net.tylerwade.learnnorsk.model.question.QuestionPackage;
 import net.tylerwade.learnnorsk.model.section.CreateSectionRequest;
 import net.tylerwade.learnnorsk.model.section.Section;
 import net.tylerwade.learnnorsk.repository.LessonRepository;
@@ -36,6 +38,8 @@ public class SectionController {
 
     @Autowired
     private LessonUtil lessonUtil;
+    @Autowired
+    private QuestionUtil questionUtil;
 
     @AdminRoute
     @PostMapping({"", "/"})
@@ -137,7 +141,15 @@ public class SectionController {
 
         // TODO: Add check to see if user had unlocked that lesson
 
-        return new ResponseEntity<>(lesson.get().getQuestions(), HttpStatus.OK);
+
+        // Convert questons to QuestionPackage
+        List<Question> questions = lesson.get().getQuestions();
+        List<QuestionPackage> questionPackages = new ArrayList<>();
+        for (Question question : questions) {
+            questionPackages.add(questionUtil.convertToQuestionPackage(question));
+        }
+
+        return new ResponseEntity<>(questionPackages , HttpStatus.OK);
     }
 
     @AdminRoute

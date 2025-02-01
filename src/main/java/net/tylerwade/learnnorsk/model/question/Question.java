@@ -41,4 +41,12 @@ public class Question {
         this.type = type;
         this.title = title;
     }
+
+    public Question(int id, String type, String title, List<Word> options, List<Word> answer) {
+        this.id = id;
+        this.type = type;
+        this.title = title;
+        this.options = options;
+        this.answer = answer;
+    }
 }
