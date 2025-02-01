@@ -20,7 +20,7 @@ public class AuthUtil {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
-    @Value("JWT_AUTH_SECRET")
+    @Value("${JWT_AUTH_SECRET}")
     private String authSecret;
 
     public String encodePassword(String password) {
