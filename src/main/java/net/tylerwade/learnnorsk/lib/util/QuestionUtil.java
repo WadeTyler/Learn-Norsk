@@ -89,11 +89,9 @@ public class QuestionUtil {
         // Find words for title
         String[] titleSplit = question.getTitle().split(" ");
         for (String wordStr : titleSplit) {
-            System.out.println("Searching for: " + wordStr);
             Optional<Word> word = wordRepo.findByEngIgnoreCase(wordStr);
             if (word.isPresent()) {
                 titleWords.add(word.get());
-                System.out.println("Found Word: " + wordStr);
             } else {
                 titleWords.add(null);
             }
