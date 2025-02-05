@@ -29,7 +29,6 @@ public class AnnaController {
     @ProtectedRoute
     public ResponseEntity<?> sendCompletion(@RequestBody SendCompletionRequest request, HttpServletRequest httpServletRequest) {
         User user = (User) httpServletRequest.getAttribute("user");
-        System.out.println(request.getContent());
 
         String response = openAIService.fetchMessage(request.getContent());
 

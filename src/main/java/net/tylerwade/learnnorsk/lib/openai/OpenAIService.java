@@ -49,11 +49,8 @@ public class OpenAIService {
 
         String requestBody = "{\"model\": \"" + model + "\", \"messages\": " + messages + "}";
 
-        System.out.println(requestBody);
-
         HttpEntity<String> request = new HttpEntity<String>(requestBody, httpHeaders);
         ResponseEntity<String> response = restTemplate.exchange(URL, HttpMethod.POST, request, String.class);
-
 
         // Parse response
         try {
