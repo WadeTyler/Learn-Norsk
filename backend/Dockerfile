@@ -9,7 +9,7 @@ COPY pom.xml .
 RUN mvn dependency:go-offline
 
 # Copy the project source code
-COPY src/ src/
+COPY src src/
 RUN mvn clean package -DskipTests
 
 # Stage 2 - Create the final image
