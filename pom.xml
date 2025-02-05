@@ -10,7 +10,7 @@
     </parent>
     <groupId>net.tylerwade</groupId>
     <artifactId>learn-norsk</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>backend</name>
     <description>backend</description>
     <url/>
@@ -92,6 +92,12 @@
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
+            </plugin>
+            <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-maven-plugin -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>3.4.2</version>
             </plugin>
         </plugins>
     </build>
