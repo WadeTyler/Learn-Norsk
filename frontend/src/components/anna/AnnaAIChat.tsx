@@ -47,7 +47,7 @@ const AnnaAiChat = ({setChatOpen}: {
       <h5 className="text-2xl text-white text-center font-bold inline-flex flex-col gap-1">
         Chat with Anna
         <br/>
-        <span className="text-sm text-white italic">Your AI Norwegian Assistant</span>
+        <span className="text-sm text-white italic">Your Norwegian AI Assistant</span>
       </h5>
       <hr className="border w-full"/>
 
