@@ -10,7 +10,7 @@ const Hero = () => {
       className="w-full h-screen md:h-[40rem] bg-accent relative"
     >
       <div className="relative w-full h-full z-10">
-        <Image src={"/book.jpeg"} alt={"hero image"} fill={true} quality={100} className="object-cover"/>
+        <Image src={"/book.jpeg"} alt={"hero image"} fill={true} quality={100} className="object-cover" loading={"eager"}/>
       </div>
 
       <div
