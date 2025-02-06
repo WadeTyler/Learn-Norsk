@@ -5,7 +5,7 @@ import {useUserStore} from "@/stores/userStore";
 import Link from "next/link";
 import {usePathname} from "next/navigation";
 import UserIcon from "@/components/navbar/UserIcon";
-import {IconLockFilled, IconMenu2, IconUser, IconX} from "@tabler/icons-react";
+import {IconLockFilled, IconMenu2, IconX} from "@tabler/icons-react";
 
 const NewNavbar = () => {
   const [isMobile, setIsMobile] = useState<boolean>(false);
