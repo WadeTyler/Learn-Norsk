@@ -8,13 +8,18 @@ import UserIcon from "@/components/navbar/UserIcon";
 import {IconLockFilled, IconMenu2, IconX} from "@tabler/icons-react";
 
 const NewNavbar = () => {
-  const [isMobile, setIsMobile] = useState<boolean>(false);
+  const [isMobile, setIsMobile] = useState<boolean>(true);
+  const [loadingSize, setLoadingSize] = useState<boolean>(true);
 
   // Determine screen size on load
   useEffect(() => {
     if (window.innerWidth <= 768) {
       setIsMobile(true);
     }
+    else {
+      setIsMobile(false);
+    }
+    setLoadingSize(false);
   }, []);
 
   // Listen for screen size changes
@@ -35,6 +40,8 @@ const NewNavbar = () => {
   }, []);
 
   const {user} = useUserStore();
+
+  if (loadingSize) return null;
 
   if (isMobile) {
     return <MobileNavbar user={user}/>
