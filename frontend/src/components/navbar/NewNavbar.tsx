@@ -5,7 +5,7 @@ import {useUserStore} from "@/stores/userStore";
 import Link from "next/link";
 import {usePathname} from "next/navigation";
 import UserIcon from "@/components/navbar/UserIcon";
-import {IconLockFilled} from "@tabler/icons-react";
+import {IconLockFilled, IconMenu2, IconUser, IconX} from "@tabler/icons-react";
 
 const NewNavbar = () => {
   const [isMobile, setIsMobile] = useState<boolean>(false);
@@ -116,10 +116,93 @@ const MobileNavbar = ({user}: {
   user: User | null;
 }) => {
 
-  console.log(user)
+  // States
+  const [isAtTop, setIsAtTop] = useState(true);
+  const [currentPage, setCurrentPage] = useState("");
+  const [isShowingMenu, setIsShowingMenu] = useState(false);
+
+  // Determine currentPage
+  const pathname = usePathname();
+  useEffect(() => {
+    if (pathname) {
+
+      if (pathname.split("/")[1] !== currentPage) {
+        setIsShowingMenu(false);
+      }
+
+      setCurrentPage(pathname.split("/")[1]);
+    }
+
+  }, [pathname]);
+
+  useEffect(() => {
+
+    const handleScroll = () => {
+      setIsAtTop(window.scrollY < 100);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    }
+  }, []);
 
   return (
-    <div>
+    <div className={"fixed w-full flex items-center justify-end top-0 left-0 z-50 "}>
+
+      <div
+        className={`flex items-center justify-center w-12 h-12 mr-4 mt-4 rounded-full duration-300 cursor-pointer text-white  hover:text-primary z-50 group ${
+          (currentPage === "" || currentPage === "about") && isAtTop || isShowingMenu ? 'bg-transparent shadow-none ' : 'bg-primary shadow-lg backdrop-blur hover:bg-background3'}`}
+        onClick={() => setIsShowingMenu(prev => !prev)}
+      >
+        {isShowingMenu
+          ? <IconX className={"group-hover:rotate-90 transition-transform duration-300"}/>
+          : <IconMenu2 className={"group-hover:rotate-180 transition-transform duration-300"}/>
+        }
+      </div>
+
+      {isShowingMenu && (
+        <div
+          className={`w-full h-screen fixed top-0 left-0 bg-[rgba(0,20,30,.7)] backdrop-blur text-white flex flex-col items-center gap-4 p-8 text-2xl`}
+        >
+          <Link href={"/"} className={"text-2xl font-semibold"}>Learn Norsk</Link>
+          <hr className="border w-full"/>
+
+          <Link href={"/"} className={`mobile-nav-link ${currentPage === '' && 'text-accentLight'}`}>Home</Link>
+          <Link href="/about"
+                className={`mobile-nav-link ${currentPage === 'about' && 'text-accentLight'}`}>About</Link>
+          <Link href="/learn"
+                className={`mobile-nav-link ${currentPage === 'learn' && 'text-accentLight'}`}>Learn</Link>
+          <Link href="/contact"
+                className={`mobile-nav-link ${currentPage === 'contact' && 'text-accentLight'}`}>Contact</Link>
+
+          <hr className="border w-full"/>
+
+          {!user && (
+            <div
+              className={"w-full flex flex-col items-center gap-4 text-2xl absolute bottom-0 p-8"}
+            >
+              <Link href={"/login"}
+                    className={`mobile-nav-link ${currentPage === 'login' && 'text-accentLight'}`}>
+                Login
+              </Link>
+              <Link href={"/signup"}
+                    className={`${currentPage === "signup" ? 'submit-btn2' : 'submit-btn3'}`}>Start Learning Now</Link>
+            </div>
+          )}
+
+          {user && (
+            <div
+              className={`w-full flex flex-col items-center gap-4 text-2xl absolute bottom-0 p-8`}
+            >
+             <UserIcon isMobile={true} />
+            </div>
+          )}
+
+        </div>
+      )}
+
 
     </div>
   )

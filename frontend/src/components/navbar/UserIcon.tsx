@@ -52,8 +52,8 @@ const UserIcon = ({isMobile = false}: {
 
   return (
     <>
-      <Link href={"/profile"} className="text-background text-xl hover:scale-95 dursation-500 inline-flex items-center"><IconUser /> Profile</Link>
-      <button onClick={handleLogout} className="text-background text-sm hover:scale-95 duration-500 inline-flex items-center" disabled={isLoggingOut}>{!isLoggingOut ? <><IconLogout /> Logout</> : <LoadingSM /> }</button>
+      <Link href={"/profile"} className="mobile-nav-link inline-flex items-center gap-2"><IconUser /> Profile</Link>
+      <button onClick={handleLogout} className="mobile-nav-link inline-flex items-center gap-2" disabled={isLoggingOut}>{!isLoggingOut ? <><IconLogout /> Logout</> : <LoadingSM /> }</button>
     </>
   )
 };

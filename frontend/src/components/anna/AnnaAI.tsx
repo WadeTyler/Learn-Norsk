@@ -17,7 +17,7 @@ const AnnaAi = () => {
   }
 
   return (
-    <div className="fixed z-50 bottom-5 right-5">
+    <div className="fixed z-40 bottom-5 right-5">
 
       {!chatOpen &&
         <motion.div

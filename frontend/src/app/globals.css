@@ -56,6 +56,10 @@ input {
   @apply duration-500 cursor-pointer hover:bg-accent hover:font-semibold px-2 py-1 rounded hover:shadow-xl;
 }
 
+.mobile-nav-link {
+  @apply duration-500 cursor-pointer hover:text-accent hover:font-semibold;
+}
+
 .nav-bar-link {
   @apply duration-300 cursor-pointer hover:text-accent;
 }
