@@ -192,13 +192,23 @@ const MobileNavbar = ({user}: {
             </div>
           )}
 
+
           {user && (
             <div
               className={`w-full flex flex-col items-center gap-4 text-2xl absolute bottom-0 p-8`}
             >
-             <UserIcon isMobile={true} />
+              {user?.role === "admin" && (
+                <Link
+                  href={"/admin/manage-content"}
+                  className={`nav-link bg-background hover:bg-accent text-primary hover:text-background inline-flex ${currentPage === "admin" && '!bg-accent !text-white'}`}
+                >
+                  <IconLockFilled/> Admin
+                </Link>
+              )}
+              <UserIcon isMobile={true}/>
             </div>
           )}
+
 
         </div>
       )}
