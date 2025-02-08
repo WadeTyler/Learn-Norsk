@@ -3,9 +3,11 @@ package net.tylerwade.learnnorsk.controller;
 import net.tylerwade.learnnorsk.lib.interceptor.admin.AdminRoute;
 import net.tylerwade.learnnorsk.lib.interceptor.user.ProtectedRoute;
 import net.tylerwade.learnnorsk.lib.util.QuestionUtil;
+import net.tylerwade.learnnorsk.model.lesson.Lesson;
 import net.tylerwade.learnnorsk.model.word.Word;
 import net.tylerwade.learnnorsk.model.question.CreateQuestionRequest;
 import net.tylerwade.learnnorsk.model.question.Question;
+import net.tylerwade.learnnorsk.repository.LessonRepository;
 import net.tylerwade.learnnorsk.repository.QuestionRepository;
 import net.tylerwade.learnnorsk.repository.WordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,14 +32,26 @@ public class QuestionController {
     @Autowired
     private QuestionUtil questionUtil;
 
+    @Autowired
+    private LessonRepository lessonRepository;
+
+
+    // TODO: update createQuestion to fit new refactor
     @AdminRoute
     @PostMapping({"/", ""})
     public ResponseEntity<?> createQuestion(@RequestBody CreateQuestionRequest createQuestionRequest) {
-        System.out.println("Attempting to create a question: \n" + createQuestionRequest);
 
         // Check for nulls
+        if (createQuestionRequest.getLessonId() == null) {
+            return new ResponseEntity<>("Lesson id is required.", HttpStatus.BAD_REQUEST);
+        }
+
         if (createQuestionRequest.getTitle() == null || createQuestionRequest.getTitle().isEmpty()) {
             return new ResponseEntity<>("No title provided", HttpStatus.BAD_REQUEST);
+        }
+
+        if (createQuestionRequest.getQuestionNumber() == null || createQuestionRequest.getQuestionNumber() == 0) {
+            return new ResponseEntity<>("Question Number not provided. Min 1", HttpStatus.BAD_REQUEST);
         }
 
         String type = createQuestionRequest.getType();
@@ -62,8 +76,20 @@ public class QuestionController {
             return new ResponseEntity<>("Invalid type", HttpStatus.BAD_REQUEST);
         }
 
+        // Check lesson exists
+        if (!lessonRepository.existsById(createQuestionRequest.getLessonId())) {
+            return new ResponseEntity<>("Lesson not found.", HttpStatus.NOT_FOUND);
+        }
+
+        // Check question number already taken in lesson
+        Optional<Question> existsByNumber = questionRepo.findByLessonIdAndQuestionNumber(createQuestionRequest.getLessonId(), createQuestionRequest.getQuestionNumber());
+
+        if (existsByNumber.isPresent()) {
+            return new ResponseEntity<>("Question Number already taken.", HttpStatus.BAD_REQUEST);
+        }
+
         // Initialize Question
-        Question newQuestion = new Question(createQuestionRequest.getType(), createQuestionRequest.getTitle());
+        Question newQuestion = new Question(createQuestionRequest.getLessonId(), type, createQuestionRequest.getTitle(), createQuestionRequest.getQuestionNumber());
 
         // Convert strings to arrays
         String[] optionStrs = !isSentenceTyping ? createQuestionRequest.getOptions().split(" ") : new String[0];

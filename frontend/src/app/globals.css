@@ -32,6 +32,14 @@ input {
   @apply bg-accent hover:bg-accentLight px-2 py-1 rounded text-white shadow-xl duration-300 cursor-pointer hover:scale-95;
 }
 
+.cancel-btn {
+  @apply bg-background3 hover:bg-foreground px-2 py-1 rounded text-white shadow-xl duration-300 cursor-pointer hover:scale-95;
+}
+
+.delete-btn {
+  @apply bg-red-800 hover:bg-red-950 px-2 py-1 rounded text-white shadow-xl duration-300 cursor-pointer hover:scale-95;
+}
+
 .submit-btn2 {
   @apply bg-accent hover:bg-accentLight px-10 py-3 rounded-full shadow-xl duration-300 cursor-pointer w-fit text-white;
 }

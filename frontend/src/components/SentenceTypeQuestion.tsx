@@ -74,11 +74,7 @@ const SentenceTypeQuestion = ({question, nextQuestion}: {
     >
       <h1 className="text-xl sm:text-2xl font-semibold inline-flex flex-col items-center">
         <span className="text-primary">How do you say: </span>
-        <span className="inline-flex items-center gap-1 flex-row">
-          {question.titleWords?.map((word: Word | null, index: number) => (
-          <TitleWord word={word} key={index} index={index} titleString={question.title} />
-        ))}
-        </span>
+        <span className={"text-background3"}>{question.title}</span>
       </h1>
 
       <hr className={"w-full border"}/>

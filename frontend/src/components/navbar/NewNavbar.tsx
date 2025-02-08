@@ -105,7 +105,7 @@ const DesktopNavbar = ({user}: {
           {!user && <Link href={"/signup"} className="submit-btn3">Start Learning Now</Link>}
           {user?.role === "admin" &&
             <Link
-              href={"/admin/manage-content"}
+              href={"/admin"}
               className={`nav-link bg-background hover:bg-accent text-primary hover:text-background inline-flex ${currentPage === "admin" && '!bg-accent !text-white'}`}
             >
               <IconLockFilled/> Admin
@@ -206,7 +206,7 @@ const MobileNavbar = ({user}: {
             >
               {user?.role === "admin" && (
                 <Link
-                  href={"/admin/manage-content"}
+                  href={"/admin"}
                   className={`nav-link bg-background hover:bg-accent text-primary hover:text-background inline-flex ${currentPage === "admin" && '!bg-accent !text-white'}`}
                 >
                   <IconLockFilled/> Admin

@@ -14,24 +14,24 @@ import java.util.List;
 public class Section {
 
     @Id @GeneratedValue
-    private int id;
-    private String title;
-    private int sectionNumber;
-    private int experienceReward;
-    private String createdAt = TimeUtil.createCreatedAt();
+    private Integer id;
 
-    @ManyToMany
-    @JoinTable(
-            name = "section_lesson",
-            joinColumns = @JoinColumn(name = "section_id"),
-            inverseJoinColumns = @JoinColumn(name = "lesson_id")
-    )
+    @Column(nullable = false, unique = true)
+    private String title;
+
+    @Column(nullable = false, unique = true)
+    private Integer sectionNumber;
+
+    private Integer experienceReward;
+
+    @OneToMany(mappedBy = "section", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Lesson> lessons;
 
-    public Section(String title, int sectionNumber, int experienceReward, List<Lesson> lessons) {
+    private String createdAt = TimeUtil.createCreatedAt();
+
+    public Section(String title, Integer sectionNumber, Integer experienceReward) {
         this.title = title;
         this.sectionNumber = sectionNumber;
         this.experienceReward = experienceReward;
-        this.lessons = lessons;
     }
 }

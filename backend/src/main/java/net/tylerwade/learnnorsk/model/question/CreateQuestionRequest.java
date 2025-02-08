@@ -10,6 +10,8 @@ import java.util.List;
 @Getter @Setter @ToString @NoArgsConstructor
 public class CreateQuestionRequest  {
 
+    private Integer lessonId;
+    private Integer questionNumber;
     private String title;
     private String type;
     private String options;

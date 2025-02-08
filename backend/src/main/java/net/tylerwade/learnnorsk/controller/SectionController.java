@@ -10,8 +10,6 @@ import net.tylerwade.learnnorsk.model.auth.User;
 import net.tylerwade.learnnorsk.model.lesson.CheckAnswersRequest;
 import net.tylerwade.learnnorsk.model.lesson.Lesson;
 import net.tylerwade.learnnorsk.model.question.Question;
-import net.tylerwade.learnnorsk.model.question.QuestionPackage;
-import net.tylerwade.learnnorsk.model.section.CreateSectionRequest;
 import net.tylerwade.learnnorsk.model.section.Section;
 import net.tylerwade.learnnorsk.repository.LessonRepository;
 import net.tylerwade.learnnorsk.repository.SectionRepository;
@@ -20,7 +18,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,43 +38,53 @@ public class SectionController {
     @Autowired
     private QuestionUtil questionUtil;
 
+
+    // Create a section
     @AdminRoute
     @PostMapping({"", "/"})
-    public ResponseEntity<?> createSection(@RequestBody CreateSectionRequest createSectionRequest) {
+    public ResponseEntity<?> createSection(@RequestBody Section createRequest) {
 
-        String title = createSectionRequest.getTitle();
-        int sectionNumber = createSectionRequest.getSectionNumber();
-        int experienceReward = createSectionRequest.getExperienceReward();
-        int[] lessonIds = createSectionRequest.getLessonIds();
+        StringBuilder badRequestMessage = new StringBuilder("");
 
-        // Check fields
-        if (title == null || title.isEmpty() || sectionNumber == 0 || experienceReward == 0 || lessonIds.length == 0) {
-            return new ResponseEntity<>("Invalid Request: All fields required.", HttpStatus.BAD_REQUEST);
+        // Check for values
+        if (createRequest.getTitle() == null || createRequest.getTitle().isEmpty()) {
+            badRequestMessage.append("Title is required.\n");
         }
 
-        // Check valid lessons and add to list
-        List<Lesson> lessons = new ArrayList<>();
-        List<Integer> notFoundLessons = new ArrayList<>();
-
-        for (Integer lessonId : lessonIds) {
-            Optional<Lesson> lesson = lessonRepo.findById(lessonId);
-            if (lesson.isEmpty()) {
-                notFoundLessons.add(lessonId);
-            } else {
-                lessons.add(lesson.get());
-            }
+        if (createRequest.getSectionNumber() == null || createRequest.getSectionNumber() == 0) {
+            badRequestMessage.append("Section number is required. Min 1.\n");
         }
 
-        // Check if any lessons were not found
-        if (notFoundLessons.size() > 0) {
-            return new ResponseEntity<>("Lessons not found: " + notFoundLessons, HttpStatus.NOT_FOUND);
+        if (createRequest.getExperienceReward() == null || createRequest.getExperienceReward() == 0) {
+            badRequestMessage.append("Experience Reward required. Min 1.\n");
         }
 
-        // Create the section
-        Section newSection = new Section(title, sectionNumber, experienceReward, lessons);
-        sectionRepo.save(newSection);
+        // Return bad request if any missing or invalid values.
+        if (!badRequestMessage.isEmpty()) {
+            return new ResponseEntity<>(badRequestMessage, HttpStatus.BAD_REQUEST);
+        }
 
-        return new ResponseEntity<>(newSection, HttpStatus.CREATED);
+        // Check if title already exists or if section number already taken
+        Optional<Section> existingSectionByNumber = sectionRepo.findBySectionNumber(createRequest.getSectionNumber());
+
+        if (existingSectionByNumber.isPresent()) {
+            badRequestMessage.append("Section Number already taken.\n");
+        }
+
+        Optional<Section> existingSectionByTitle = sectionRepo.findByTitleIgnoreCase(createRequest.getTitle());
+
+        if (existingSectionByTitle.isPresent()) {
+            badRequestMessage.append("Section title already exists.\n");
+        }
+
+        if (!badRequestMessage.isEmpty()) {
+            return new ResponseEntity<>(badRequestMessage, HttpStatus.BAD_REQUEST);
+        }
+
+        // Save section
+        sectionRepo.save(createRequest);
+
+        return new ResponseEntity<>(createRequest, HttpStatus.CREATED);
     }
 
     @ProtectedRoute
@@ -85,10 +92,9 @@ public class SectionController {
     public ResponseEntity<?> getAllSections() {
         List<Section> sections = sectionRepo.findAllOrderBySectionNumberAsc();
 
-        // Remove questions from each lesson
+        // Set all questions to null
         for (Section section : sections) {
-            List<Lesson> lessons = section.getLessons();
-            for (Lesson lesson : lessons) {
+            for (Lesson lesson : section.getLessons()) {
                 lesson.setQuestions(null);
             }
         }
@@ -101,11 +107,6 @@ public class SectionController {
     public ResponseEntity<?> getSectionById(@PathVariable int id) {
         Optional<Section> section = sectionRepo.findById(id);
         if (section.isEmpty()) return new ResponseEntity<>("Section not found", HttpStatus.NOT_FOUND);
-
-        // Remove questions from each lesson
-        for (Lesson lesson : section.get().getLessons()) {
-            lesson.setQuestions(null);
-        }
 
         return new ResponseEntity<>(section.get(), HttpStatus.OK);
     }
@@ -121,35 +122,16 @@ public class SectionController {
     public ResponseEntity<?> getQuestionsInLessonInSection(@PathVariable int sectionId, @PathVariable int lessonId) {
 
         // Check valid section id
-        Optional<Section> section = sectionRepo.findById(sectionId);
-        if (section.isEmpty()) return new ResponseEntity<>("Section not found.", HttpStatus.NOT_FOUND);
+        Optional<Lesson> lesson = lessonRepo.findByIdAndSectionId(lessonId, sectionId);
 
-        // Check valid lesson id
-        Optional<Lesson> lesson = lessonRepo.findById(lessonId);
-        if (lesson.isEmpty()) return new ResponseEntity<>("Lesson not found", HttpStatus.NOT_FOUND);
-
-        // Check lesson is in section
-        boolean isLessonInSection = false;
-        for (Lesson l : section.get().getLessons()) {
-            if (l.getId() == lesson.get().getId()) {
-                isLessonInSection = true;
-                break;
-            }
+        // Check exists
+        if (lesson.isEmpty()) {
+            return new ResponseEntity<>("Lesson not found", HttpStatus.NOT_FOUND);
         }
-
-        if (!isLessonInSection) return new ResponseEntity<>("Requested Lesson is not in that section", HttpStatus.BAD_REQUEST);
 
         // TODO: Add check to see if user had unlocked that lesson
 
-
-        // Convert questons to QuestionPackage
-        List<Question> questions = lesson.get().getQuestions();
-        List<QuestionPackage> questionPackages = new ArrayList<>();
-        for (Question question : questions) {
-            questionPackages.add(questionUtil.convertToQuestionPackage(question));
-        }
-
-        return new ResponseEntity<>(questionPackages , HttpStatus.OK);
+        return new ResponseEntity<>(lesson.get().getQuestions(), HttpStatus.OK);
     }
 
     @AdminRoute
@@ -172,24 +154,9 @@ public class SectionController {
     public ResponseEntity<?> checkAnswers(@PathVariable int sectionId, @PathVariable int lessonId, @RequestBody List<CheckAnswersRequest> userAnswers, HttpServletRequest request) throws Exception {
         User user = (User) request.getAttribute("user");
 
-        // Check section exists
-        Optional<Section> sectionOptional = sectionRepo.findById(sectionId);
-        if (sectionOptional.isEmpty()) return new ResponseEntity<>("Invalid Section Id", HttpStatus.BAD_REQUEST);
-
         // Check lesson exists
-        Optional<Lesson> lessonOptional = lessonRepo.findById(lessonId);
-        if (lessonOptional.isEmpty()) return new ResponseEntity<>("Invalid Lesson Id", HttpStatus.BAD_REQUEST);
-
-
-        // Check lesson is in section
-        boolean exists = false;
-        for (Lesson lesson : sectionOptional.get().getLessons()) {
-            if (lesson.getId() == lessonOptional.get().getId()) {
-                exists = true;
-                break;
-            }
-        }
-        if (!exists) return new ResponseEntity<>("Lesson does not match section", HttpStatus.BAD_REQUEST);
+        Optional<Lesson> lessonOptional = lessonRepo.findByIdAndSectionId(lessonId, sectionId);
+        if (lessonOptional.isEmpty()) return new ResponseEntity<>("Lesson not found.", HttpStatus.NOT_FOUND);
 
         List<Question> questions = lessonOptional.get().getQuestions();
 

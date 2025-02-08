@@ -11,7 +11,7 @@ interface LessonStore {
   lessons: Lesson[];
   searchLessons: () => Promise<void>;
   searchLessonsById: (id: number) => Promise<void>;
-  deleteLesson: (id: number) => Promise<void>;
+  deleteLesson: (id: number) => Promise<boolean>;
   isDeletingLesson: boolean;
   deleteLessonError: string;
   deleteLessonSuccess: string;
@@ -89,10 +89,12 @@ export const useLessonStore = create<LessonStore>((set, get) => ({
       const response = await axios.delete(`/lessons/${id}`);
       set({ isDeletingLesson: false, deleteLessonSuccess: response.data });
       get().fetchTotal();
+      return true;
   } catch (e) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-expect-error
     set({ isDeletingLesson: false, deleteLessonError: e.response?.data || "Failed to delete lesson" })};
+    return false;
   },
 
   isLoadingTotalLessons: false,

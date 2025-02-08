@@ -2,6 +2,7 @@ import {create} from "zustand";
 import axios from "@/lib/axios";
 import {Question, Section} from "@/types/Types";
 import {QuestionQueue} from "@/lib/QuestionQueue";
+import toast from "react-hot-toast";
 
 interface SectionStore {
 
@@ -13,10 +14,13 @@ interface SectionStore {
   searchSectionsById: (id: number) => Promise<void>;
   getAllSections: () => Promise<void>;
 
+  fetchingSection: boolean;
+  getSectionById: (sectionId: number) => Promise<Section | null>;
+
   newSection: Section | null;
   isCreatingSection: boolean;
   createSectionError: string;
-  createSection: (title: string, sectionNumber: number, experienceReward: number, lessonIds: number[]) => Promise<void>;
+  createSection: (title: string, sectionNumber: number, experienceReward: number) => Promise<Section>;
 
   isDeletingSection: boolean;
   deleteSectionSuccess: string;
@@ -76,16 +80,34 @@ export const useSectionStore = create<SectionStore>((set, get) => ({
     }
   },
 
+  fetchingSection: false,
+  getSectionById: async (sectionId: number) => {
+    try {
+      set({ fetchingSection: true });
+      const response = await axios.get(`/sections/${sectionId}`);
+      set({ fetchingSection: false });
+      return response.data;
+    } catch (e) {
+      set({ fetchingSection: false });
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
+      toast.error(e.response.data || "Failed to load section.");
+      return null;
+    }
+  },
+
 
   newSection: null,
   isCreatingSection: false,
   createSectionError: "",
-  createSection: async (title, sectionNumber, experienceReward, lessonIds) => {
+  createSection: async (title, sectionNumber, experienceReward) => {
     try {
       set({isCreatingSection: true, newSection: null});
-      const response = await axios.post("/sections", {title, sectionNumber, experienceReward, lessonIds});
+      const response = await axios.post("/sections", {title, sectionNumber, experienceReward});
       set({newSection: response.data, isCreatingSection: false});
       get().fetchTotal();
+      toast.success(`Section '${title}' created successfully.`);
+      return response.data;
     } catch (e) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-expect-error

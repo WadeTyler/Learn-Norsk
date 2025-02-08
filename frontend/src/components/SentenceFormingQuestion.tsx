@@ -68,12 +68,8 @@ const SentenceFormingQuestion = ({question, nextQuestion}: {
       className="w-full h-full flex flex-col items-center gap-4 relative ">
       <h1 className="text-primary text-xl sm:text-2xl font-semibold inline-flex flex-col items-center relative">
         <span>Form the Sentence: </span>
+        <span className={"text-background3"}>{question.title}</span>
 
-        <span className="inline-flex items-center gap-1 text-background3 font-bold text-xl">
-          {question.titleWords?.map((word: Word | null, index: number) => (
-            <TitleWord word={word} key={index} index={index} titleString={question.title}/>
-          ))}
-        </span>
       </h1>
 
       <hr className={"w-full border"}/>

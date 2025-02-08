@@ -24,7 +24,7 @@ interface QuestionStore {
   isDeletingQuestion: boolean;
   deleteQuestionError: string;
   deleteQuestionSuccess: string;
-  deleteQuestion: (id: number) => Promise<void>;
+  deleteQuestion: (id: number) => Promise<boolean>;
 }
 
 export const useQuestionStore = create<QuestionStore>((set) => ({
@@ -89,10 +89,12 @@ export const useQuestionStore = create<QuestionStore>((set) => ({
       set({ isDeletingQuestion: true, deleteQuestionError: "", deleteQuestionSuccess: "" });
       const response = await axios.delete(`/questions/${id}`);
       set({ deleteQuestionSuccess: response.data || "Question Deleted.", isDeletingQuestion: false });
+      return true;
     } catch (e) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-expect-error
       set({ isDeletingQuestion: false, deleteQuestionError: e.response?.data || "Failed to delete question.", deleteQuestionSuccess: "" });
+      return false;
     }
   }
 }));

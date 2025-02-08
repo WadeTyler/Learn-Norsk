@@ -7,9 +7,10 @@ export interface Word {
 
 export interface Question {
   id: number;
+  lessonId: number;
+  questionNumber: number;
   type: "image-choice" | "sentence-forming" | "sentence-typing";
   title: string;
-  titleWords?: Word[];
   options?: Word[];
   answer: Word[];
 }
@@ -28,6 +29,7 @@ export interface User {
 
 export interface Lesson {
   id: number;
+  sectionId: number;
   title: string;
   description: string;
   lessonNumber: number;
