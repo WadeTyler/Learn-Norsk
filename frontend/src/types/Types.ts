@@ -67,3 +67,13 @@ export interface ChatMessage {
   userId: string;
   timestamp: string;
 }
+
+export interface AdminDashboardData {
+  totalUsers: number;
+  totalSections: number;
+  totalLessons: number;
+  totalQuestions: number;
+  totalWords: number;
+  totalCompletedLessons: number;
+  totalAdmins: number;
+}
