@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -102,13 +103,13 @@ public class SectionController {
         return new ResponseEntity<>(sections, HttpStatus.OK);
     }
 
-    @ProtectedRoute
+    @AdminRoute
     @GetMapping("/{id}")
     public ResponseEntity<?> getSectionById(@PathVariable int id) {
-        Optional<Section> section = sectionRepo.findById(id);
-        if (section.isEmpty()) return new ResponseEntity<>("Section not found", HttpStatus.NOT_FOUND);
+        Optional<Section> sectionOptional = sectionRepo.findById(id);
+        if (sectionOptional.isEmpty()) return new ResponseEntity<>("Section not found", HttpStatus.NOT_FOUND);
 
-        return new ResponseEntity<>(section.get(), HttpStatus.OK);
+        return new ResponseEntity<>(sectionOptional.get(), HttpStatus.OK);
     }
 
     @ProtectedRoute

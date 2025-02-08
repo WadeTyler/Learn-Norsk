@@ -48,6 +48,10 @@ input {
   @apply bg-transparent border-white border-2 hover:bg-accent hover:border-accent px-5 py-2 rounded-full shadow-xl duration-300 cursor-pointer w-fit text-white;
 }
 
+.back-btn {
+  @apply bg-transparent hover:bg-accent px-2 py-1 rounded text-background3 hover:text-white hover:shadow-xl duration-300 cursor-pointer hover:scale-95;
+}
+
 .input-bar {
   @apply border border-zinc-400 rounded p-2 w-full focus:ring-primary bg-transparent focus:outline-primary focus:shadow-xl hover:shadow-xl duration-300 focus:font-semibold;
 }

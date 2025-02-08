@@ -1,20 +1,26 @@
 'use client';
-import React, {useState} from 'react';
+import React, {SetStateAction, useState} from 'react';
 import {Lesson, Question} from "@/types/Types";
 import EditQuestion from "@/components/admin/questions/EditQuestion";
 import {AnimatePresence, motion} from 'framer-motion';
 import ConfirmPanel from "@/components/util/ConfirmPanel";
 import {useLessonStore} from "@/stores/lessonStore";
+import {useRouter} from "next/navigation";
+import {LoadingSM} from "@/components/util/Loading";
+import toast from "react-hot-toast";
 
-const EditLesson = ({lesson, stopEditingLesson, reloadSection}: {
+const EditLesson = ({lesson, stopEditingLesson, reloadSection, currentQuestion, setCurrentQuestion}: {
   lesson: Lesson;
   stopEditingLesson: () => void;
   reloadSection: () => void;
+  currentQuestion: Question | null;
+  setCurrentQuestion: React.Dispatch<SetStateAction<Question | null>>;
 }) => {
 
+  // Nav
+  const router = useRouter();
+
   // States
-  const [isEditingQuestion, setIsEditingQuestion] = useState<boolean>(false);
-  const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   const [isConfirmingDeleteLesson, setIsConfirmingDeleteLesson] = useState<boolean>(false);
   const [title, setTitle] = useState<string>(lesson.title);
   const [description, setDescription] = useState<string>(lesson.description);
@@ -22,17 +28,26 @@ const EditLesson = ({lesson, stopEditingLesson, reloadSection}: {
   const [experienceReward, setExperienceReward] = useState<number>(lesson.experienceReward);
 
   // Stores
-  const {deleteLesson, isDeletingLesson, deleteLessonError} = useLessonStore();
+  const {
+    deleteLesson,
+    isDeletingLesson,
+    deleteLessonError,
+    updateLesson,
+    updateLessonError,
+    isUpdatingLesson
+  } = useLessonStore();
 
   // Functions
   function editQuestion(question: Question) {
     setCurrentQuestion(question);
-    setIsEditingQuestion(true);
   }
 
   function stopEditingQuestion() {
     setCurrentQuestion(null);
-    setIsEditingQuestion(false);
+  }
+
+  function createQuestion() {
+    router.push(`/admin/questions/create?sectionId=${lesson.sectionId}&lessonId=${lesson.id}`);
   }
 
   async function handleDeleteLesson() {
@@ -45,6 +60,22 @@ const EditLesson = ({lesson, stopEditingLesson, reloadSection}: {
 
   async function handleSaveChanges() {
     // TODO: Implement handleSaveChanges for editing lesson
+    const updateRequest = {
+      id: lesson.id,
+      sectionId: lesson.sectionId,
+      title: title,
+      description: description,
+      lessonNumber: number,
+      experienceReward: experienceReward,
+      createdAt: lesson.createdAt
+    };
+
+    const updatedLesson = await updateLesson(updateRequest);
+
+    if (updatedLesson) {
+      toast.success("Lesson changes saved.");
+      reloadSection();
+    }
   }
 
   return (
@@ -55,7 +86,7 @@ const EditLesson = ({lesson, stopEditingLesson, reloadSection}: {
       transition={{duration: .2}}
       className={"fixed w-[35rem] h-full top-0 left-0 flex flex-col gap-4 p-4 pt-32 overflow-y-scroll shadow-2xl z-40 bg-white"}
     >
-      <p className="text-primary text-2xl font-semibold">Editing Lesson: {lesson.id}</p>
+      <p className="text-primary text-2xl font-semibold">Editing Lesson</p>
 
       <hr className="border w-full"/>
 
@@ -98,6 +129,9 @@ const EditLesson = ({lesson, stopEditingLesson, reloadSection}: {
       <hr className="w-full border"/>
 
       <p className="text-primary font-semibold text-xl">Questions ({lesson.questions?.length})</p>
+      <hr className="border w-full"/>
+      <button className="submit-btn" onClick={createQuestion}>Create Question</button>
+      <hr className="border w-full"/>
       <table className={"bg-white table-auto"}>
         <thead>
         <tr className={"bg-background3 text-white font-bold gap-4"}>
@@ -131,13 +165,22 @@ const EditLesson = ({lesson, stopEditingLesson, reloadSection}: {
 
       <div className="flex items-center justify-center gap-4 w-full">
         {/* TODO: Add func */}
-        <button className="submit-btn" onClick={() => handleSaveChanges()}>Save Changes</button>
+        <button className="submit-btn" disabled={isUpdatingLesson} onClick={() => handleSaveChanges()}>
+          {isUpdatingLesson
+            ? <LoadingSM/>
+            : 'Save Changes'
+          }
+        </button>
         <button className="delete-btn" onClick={() => setIsConfirmingDeleteLesson(true)}>Delete Lesson</button>
         <button className="cancel-btn" onClick={() => stopEditingLesson()}>Cancel</button>
       </div>
 
+      {updateLessonError && (
+        <p className="text-red-500 font-semibold">{updateLessonError}</p>
+      )}
+
       <AnimatePresence>
-        {isEditingQuestion && currentQuestion &&
+        {currentQuestion &&
           <EditQuestion question={currentQuestion} stopEditingQuestion={stopEditingQuestion}
                         reloadSection={reloadSection}/>}
       </AnimatePresence>

@@ -1,10 +1,10 @@
 'use client';
 import React, {useState} from 'react';
 import {Question} from "@/types/Types";
-import { motion } from 'framer-motion';
+import {motion} from 'framer-motion';
 import {useQuestionStore} from "@/stores/questionStore";
-import {useSectionStore} from "@/stores/sectionStore";
 import ConfirmPanel from "@/components/util/ConfirmPanel";
+import ChangeQuestionNumber from "@/components/admin/questions/ChangeQuestionNumber";
 
 const EditQuestion = ({question, stopEditingQuestion, reloadSection}: {
   question: Question;
@@ -14,10 +14,11 @@ const EditQuestion = ({question, stopEditingQuestion, reloadSection}: {
 
 
   // Stores
-  const { deleteQuestion, deleteQuestionError, isDeletingQuestion } = useQuestionStore();
+  const {deleteQuestion, deleteQuestionError, isDeletingQuestion} = useQuestionStore();
 
   // States
   const [isConfirmingDeleteQuestion, setIsConfirmingDeleteQuestion] = useState<boolean>(false);
+  const [isChangingQuestionNumber, setIsChangingQuestionNumber] = useState<boolean>(false);
 
   // Functions
   async function handleDeleteQuestion() {
@@ -32,10 +33,10 @@ const EditQuestion = ({question, stopEditingQuestion, reloadSection}: {
 
   return (
     <motion.div
-      initial={{ x: '-100%', opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: '-100%', opacity: 0 }}
-      transition={{ duration: .2 }}
+      initial={{x: '-100%', opacity: 0}}
+      animate={{x: 0, opacity: 1}}
+      exit={{x: '-100%', opacity: 0}}
+      transition={{duration: .2}}
       className={"fixed w-[25rem] h-full top-0 left-[35rem] flex flex-col gap-4 p-4 pt-32 overflow-y-scroll bg-white shadow-xl z-40"}
     >
 
@@ -76,7 +77,8 @@ const EditQuestion = ({question, stopEditingQuestion, reloadSection}: {
       <hr className="w-full border"/>
 
       <div className="flex items-center justify-center w-full gap-4">
-        <button className="delete-btn" onClick={() => setIsConfirmingDeleteQuestion(true)}>Delete Question</button>
+        <button className="submit-btn text-sm" onClick={() => setIsChangingQuestionNumber(true)}>Change Question Number</button>
+        <button className="delete-btn text-sm" onClick={() => setIsConfirmingDeleteQuestion(true)}>Delete Question</button>
         <button className="cancel-btn" onClick={stopEditingQuestion}>Cancel</button>
       </div>
 
@@ -87,9 +89,14 @@ const EditQuestion = ({question, stopEditingQuestion, reloadSection}: {
         </>
       )}
 
+      {isChangingQuestionNumber && (
+        <ChangeQuestionNumber question={question} cancel={() => setIsChangingQuestionNumber(false)} reloadSection={reloadSection} />
+      )}
 
       {isConfirmingDeleteQuestion && (
-        <ConfirmPanel header={"You are about to delete a question!"} body={"Are you sure you want to delete this question?"} cancelFunc={() => setIsConfirmingDeleteQuestion(false)} confirmFunc={handleDeleteQuestion} />
+        <ConfirmPanel header={"You are about to delete a question!"}
+                      body={"Are you sure you want to delete this question?"}
+                      cancelFunc={() => setIsConfirmingDeleteQuestion(false)} confirmFunc={handleDeleteQuestion}/>
       )}
 
 

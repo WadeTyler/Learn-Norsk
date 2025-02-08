@@ -31,7 +31,8 @@ public class Lesson {
     private String description;
     private Integer experienceReward;
 
-    @OneToMany(mappedBy = "lesson", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "lesson", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OrderBy("questionNumber ASC")
     private List<Question> questions;
 
     private String createdAt = TimeUtil.createCreatedAt();

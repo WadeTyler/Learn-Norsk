@@ -6,7 +6,7 @@ interface LessonStore {
   isCreatingLesson: boolean;
   newLesson: Lesson | null;
   createLessonError: string;
-  createLesson: (title: string, description: string, lessonNumber: number, experienceReward: number, questionIds: number[]) => Promise<void>;
+  createLesson: (sectionId: number, lessonNumber: number, title: string, description: string, experienceReward: number) => Promise<Lesson>;
   isSearchingLessons: boolean;
   lessons: Lesson[];
   searchLessons: () => Promise<void>;
@@ -29,6 +29,10 @@ interface LessonStore {
   isLoadingCompletedLessons: boolean;
   loadCompletedLessonsError: string;
   fetchCompletedLessons: () => Promise<void>;
+
+  isUpdatingLesson: boolean;
+  updateLessonError: string;
+  updateLesson: (lesson: Lesson) => Promise<Lesson>;
 };
 
 export const useLessonStore = create<LessonStore>((set, get) => ({
@@ -36,16 +40,18 @@ export const useLessonStore = create<LessonStore>((set, get) => ({
   isCreatingLesson: false,
   newLesson: null,
   createLessonError: "",
-  createLesson: async (title, description, lessonNumber, experienceReward, questionIds) => {
+  createLesson: async (sectionId, lessonNumber, title, description, experienceReward ) => {
     try {
       set({ isCreatingLesson: true, newLesson: null, createLessonError: "" });
-      const response = await axios.post("/lessons", { title, description, lessonNumber, experienceReward, questionIds });
+      const response = await axios.post("/lessons", {sectionId, lessonNumber, title, description, experienceReward});
       set({ isCreatingLesson: false, newLesson: response.data });
       get().fetchTotal();
+      return response.data;
     } catch (e) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-expect-error
       set({ createLessonError: e.response?.data || "Failed to create lesson", isCreatingLesson: false });
+      return null;
     }
   },
 
@@ -154,4 +160,19 @@ export const useLessonStore = create<LessonStore>((set, get) => ({
     }
   },
 
+  isUpdatingLesson: false,
+  updateLessonError: "",
+  updateLesson: async (lesson) => {
+    try {
+      set({ isUpdatingLesson: true, updateLessonError: "" });
+      const response = await axios.put(`/lessons/${lesson.id}`, lesson);
+      set({ isUpdatingLesson: false });
+      return response.data;
+    } catch (e) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
+      set({ isUpdatingLesson: false, updateLessonError: e.response.data || "Failed to update lesson." });
+      return null;
+    }
+  }
 }))

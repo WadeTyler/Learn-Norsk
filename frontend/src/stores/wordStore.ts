@@ -7,7 +7,7 @@ interface WordStore {
   words: Word[];
   isAddingWords: boolean;
   existingWords: Word[];
-  addWords: (words: Word[]) => Promise<void>;
+  addWords: (words: Word[]) => Promise<boolean>;
   addWordsError: string;
   searchForWordError: string;
   searchForWord: (word: string) => Promise<void>;
@@ -93,6 +93,7 @@ export const useWordStore = create<WordStore>((set, get) => ({
 
       // Refetch total
       get().fetchTotal();
+      return true;
 
     } catch (error) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -106,7 +107,7 @@ export const useWordStore = create<WordStore>((set, get) => ({
         // @ts-expect-error
         set({ existingWords: error.response.data.existingWords });
       }
-
+      return false;
     } finally {
       set({ isAddingWords: false });
     }

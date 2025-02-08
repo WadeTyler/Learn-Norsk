@@ -25,7 +25,7 @@ interface SectionStore {
   isDeletingSection: boolean;
   deleteSectionSuccess: string;
   deleteSectionError: string;
-  deleteSection: (id: number) => Promise<void>;
+  deleteSection: (id: number) => Promise<boolean>;
 
   questions: QuestionQueue;
   currentQuestion: Question | null;
@@ -125,10 +125,15 @@ export const useSectionStore = create<SectionStore>((set, get) => ({
       const response = await axios.delete(`/sections/${id}`);
       set({deleteSectionSuccess: response.data, isDeletingSection: false});
       get().fetchTotal();
+      return true;
     } catch (e) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-expect-error
       set({deleteSectionError: e.response?.data || "Failed to delete section", isDeletingSection: false});
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
+      toast.error(e.response?.data || "Failed to delete section.");
+      return false;
     }
   },
 

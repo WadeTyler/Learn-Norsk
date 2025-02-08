@@ -25,6 +25,7 @@ public class Section {
     private Integer experienceReward;
 
     @OneToMany(mappedBy = "section", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OrderBy("lessonNumber ASC")
     private List<Lesson> lessons;
 
     private String createdAt = TimeUtil.createCreatedAt();

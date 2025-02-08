@@ -1,18 +1,23 @@
 'use client';
 import React, {useState} from 'react';
+import {useRouter, useSearchParams} from "next/navigation";
+import {useAdminProtected} from "@/hooks/useAdminProtected";
+import LoadingScreen from "@/components/util/LoadingScreen";
 import {useLessonStore} from "@/stores/lessonStore";
 import {LoadingSM} from "@/components/util/Loading";
-import {Section} from "@/types/Types";
-import { motion } from 'framer-motion';
 
-const CreateLesson = ({section, cancel, reloadSection}: {
-  section: Section;
-  cancel: () => void;
-  reloadSection: () => void;
-}) => {
+const Page = () => {
+
+  // Protection
+  const {isCheckingAdmin} = useAdminProtected();
+
+  // Nav
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const sectionIdParam = searchParams.get("sectionId");
 
   // States
-  const [sectionId, setSectionId] = useState<number>(section.id);
+  const [sectionId, setSectionId] = useState<number>(sectionIdParam ? parseInt(sectionIdParam) : 0);
   const [lessonNumber, setLessonNumber] = useState<number>(0);
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
@@ -27,21 +32,17 @@ const CreateLesson = ({section, cancel, reloadSection}: {
     const newLesson = await createLesson(sectionId, lessonNumber, title, description, experienceReward);
 
     if (newLesson) {
-      reloadSection();
-      cancel();
+      router.push(`/admin/sections/${sectionId}`);
     }
   }
 
+  // Returns
+  if (isCheckingAdmin) return <LoadingScreen/>
+
   return (
-    <motion.div
-      initial={{ x: '-100%' }}
-      animate={{ x: 0 }}
-      exit={{ x: '-100%' }}
-      transition={{ duration: .2 }}
-      className={"fixed top-0 left-0 w-[25rem] h-screen p-8 pt-24 flex flex-col items-center justify-center z-40 overflow-y-scroll bg-white shadow-xl"}
-    >
+    <div className={"w-full min-h-screen p-16 flex flex-col items-center justify-center"}>
       <form
-        className="w-full flex flex-col gap-4"
+        className="w-[35rem] flex flex-col gap-4"
         onSubmit={(e) => {
           e.preventDefault();
           handleSubmit();
@@ -75,16 +76,13 @@ const CreateLesson = ({section, cancel, reloadSection}: {
           <input type="number" className="input-bar" value={experienceReward}
                  onChange={(e) => setExperienceReward(e.target.valueAsNumber)}/>
         </div>
-        <div className="flex gap-4 items-center w-full">
-          <button className="submit-btn" disabled={isCreatingLesson}>
-            {isCreatingLesson
-              ? <LoadingSM/>
-              : 'Create Lesson'
-            }
-          </button>
 
-          <section className="cancel-btn" onClick={cancel}>Cancel</section>
-        </div>
+        <button className="submit-btn" disabled={isCreatingLesson}>
+          {isCreatingLesson
+            ? <LoadingSM/>
+            : 'Create Lesson'
+          }
+        </button>
 
         {createLessonError && (
           <>
@@ -94,8 +92,8 @@ const CreateLesson = ({section, cancel, reloadSection}: {
         )}
       </form>
 
-    </motion.div>
+    </div>
   );
 };
 
-export default CreateLesson;
+export default Page;

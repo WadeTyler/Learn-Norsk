@@ -17,9 +17,12 @@ import net.tylerwade.learnnorsk.repository.SectionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
@@ -182,6 +185,58 @@ public class LessonController {
         List<CompletedLesson> completedLessons = completedLessonRepo.getCompletedLessonByUserId(user.getId());
         return new ResponseEntity<>(completedLessons, HttpStatus.OK);
 
+    }
+
+
+    @AdminRoute
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateLesson(@PathVariable Integer id, @RequestBody Lesson updatedRequest) {
+        Optional<Lesson> lessonOptional = lessonRepo.findById(id);
+
+        if (lessonOptional.isEmpty()) {
+            return new ResponseEntity<>("Lesson not found.", HttpStatus.NOT_FOUND);
+        }
+
+        Lesson lesson = lessonOptional.get();
+
+        if (updatedRequest.getTitle() == null || updatedRequest.getTitle().isEmpty()) {
+            return new ResponseEntity<>("Title is required.", HttpStatus.BAD_REQUEST);
+        }
+
+        if (updatedRequest.getDescription() == null || updatedRequest.getDescription().isEmpty()) {
+            return new ResponseEntity<>("Description is required.", HttpStatus.BAD_REQUEST);
+        }
+
+        if (updatedRequest.getLessonNumber() == null || updatedRequest.getLessonNumber() <= 0) {
+            return new ResponseEntity<>("Lesson Number is required. Min 1", HttpStatus.BAD_REQUEST);
+        }
+
+        if (updatedRequest.getExperienceReward() == null || updatedRequest.getExperienceReward() <= 0) {
+            return new ResponseEntity<>("Experience reward is required. Min 1", HttpStatus.BAD_REQUEST);
+        }
+
+        // Check if title already taken
+        Optional<Lesson> existingByTitle = lessonRepo.findBySectionIdAndTitleIgnoreCase(lesson.getSectionId(), updatedRequest.getTitle());
+        if (existingByTitle.isPresent() && !Objects.equals(existingByTitle.get().getId(), lesson.getId())) {
+            return new ResponseEntity<>("Lesson with that title already exists in section.", HttpStatus.BAD_REQUEST);
+        }
+
+        // Check if Lesson number already taken
+        Optional<Lesson> existingByLessonNumber = lessonRepo.findBySectionIdAndLessonNumber(lesson.getSectionId(), updatedRequest.getLessonNumber());
+        if (existingByLessonNumber.isPresent() && !Objects.equals(existingByLessonNumber.get().getId(), lesson.getId())) {
+            return new ResponseEntity<>("Lesson number already taken.", HttpStatus.BAD_REQUEST);
+        }
+
+        // Update values
+        lesson.setTitle(updatedRequest.getTitle());
+        lesson.setDescription(updatedRequest.getDescription());
+        lesson.setLessonNumber(updatedRequest.getLessonNumber());
+        lesson.setExperienceReward(updatedRequest.getExperienceReward());
+
+        // Save updated lesson
+        lessonRepo.save(lesson);
+
+        return new ResponseEntity<>(lesson, HttpStatus.OK);
     }
 
 

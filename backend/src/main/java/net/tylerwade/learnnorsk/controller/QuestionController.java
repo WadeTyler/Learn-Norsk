@@ -1,5 +1,8 @@
 package net.tylerwade.learnnorsk.controller;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import net.tylerwade.learnnorsk.lib.interceptor.admin.AdminRoute;
 import net.tylerwade.learnnorsk.lib.interceptor.user.ProtectedRoute;
 import net.tylerwade.learnnorsk.lib.util.QuestionUtil;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
@@ -116,12 +120,16 @@ public class QuestionController {
 
             // If we have an option
             if (questionUtil.checkExistsAndAddToList(optionStrs, options, i, noImageList)) {
-                notFoundList.add(optionStrs[i]);
+                if (!notFoundList.contains(optionStrs[i])) {
+                    notFoundList.add(optionStrs[i]);
+                }
             }
 
             // If we have an answer
             if (questionUtil.checkExistsAndAddToList(answerStrs, answer, i, noImageList)) {
-                notFoundList.add(answerStrs[i]);
+                if (!notFoundList.contains(answerStrs[i])) {
+                    notFoundList.add(answerStrs[i]);
+                }
             }
 
             // Increment
@@ -130,7 +138,9 @@ public class QuestionController {
 
         // Check if any words were not found
         if (notFoundList.size() > 0) {
-            return new ResponseEntity<>("Words not found: " + String.join(", ", notFoundList), HttpStatus.BAD_REQUEST);
+            WordsNotFoundError wordsNotFoundError = new WordsNotFoundError("Some or all Words were not found.", notFoundList);
+
+            return new ResponseEntity<>(wordsNotFoundError, HttpStatus.BAD_REQUEST);
         }
 
         // Check if any words don't have images
@@ -222,5 +232,50 @@ public class QuestionController {
 
         return new ResponseEntity<>("Question '" + id + "' deleted", HttpStatus.OK);
     }
+
+    // Change question number
+    @AdminRoute
+    @PatchMapping("/{id}/change-question-number/{value}")
+    public ResponseEntity<?> changeQuestionNumber(@PathVariable Integer id, @PathVariable Integer value) {
+        Optional<Question> questionOptional = questionRepo.findById(id);
+        if (questionOptional.isEmpty()) {
+            return new ResponseEntity<>("Question '" + id + "' not found.", HttpStatus.NOT_FOUND);
+        }
+
+        Question question = questionOptional.get();
+        
+        // Check if a question in the same section already has the target number
+        Optional<Question> existingNumberQuestion = questionRepo.findByLessonIdAndQuestionNumber(question.getLessonId(), value);
+
+        if (existingNumberQuestion.isPresent() && !Objects.equals(existingNumberQuestion.get().getId(), question.getId())) {
+            return new ResponseEntity<>("Question with the number '" + value + "' already taken.", HttpStatus.BAD_REQUEST);
+        }
+
+        // Change Question
+        question.setQuestionNumber(value);
+
+        // Save question
+        questionRepo.save(question);
+
+        return new ResponseEntity<>(question, HttpStatus.OK);
+    }
+
+
+
+    // UTIL CLASSES
+
+    @Getter @Setter @NoArgsConstructor
+    class WordsNotFoundError {
+        private String message;
+        private String errorType = "WORDS_NOT_FOUND";
+        private List<String> notFoundWords;
+
+        public WordsNotFoundError(String message, List<String> notFoundWords) {
+            this.message = message;
+            this.notFoundWords = notFoundWords;
+        }
+    }
+
+
 }
 
