@@ -1,4 +1,4 @@
-# Learn Norsk 🇳🇴
+# Learn Norsk
 
 A modern web application designed to help users learn, practice, and master the Norwegian language. Built with TypeScript and Java, Learn Norsk provides an interactive platform for language learners at all levels.
 
