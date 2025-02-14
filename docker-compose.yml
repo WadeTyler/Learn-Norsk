@@ -3,7 +3,7 @@ services:
   # MySQL Database
   mysql-db:
     image: mysql:8.0
-    container_name: db
+    container_name: learn-norsk-db
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -23,7 +23,7 @@ services:
   # Backend Server
   backend:
     build: ./backend
-    container_name: backend
+    container_name: learn-norsk-backend
     depends_on:
       - mysql-db
     ports:
@@ -41,7 +41,7 @@ services:
   # Frontend
   frontend:
     build: ./frontend
-    container_name: frontend
+    container_name: learn-norsk-frontend
     depends_on:
       - backend
     ports:
